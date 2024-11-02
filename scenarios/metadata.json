@@ -398,33 +398,12 @@
         }
     },
     {
-        "key": "PostgresRagLlmDemo/README.md",
-        "title": "Quickstart: Deploy a Postgres vector database",
-        "description": "Setup a Postgres vector database and openai resources to run a RAG-LLM model",
-        "stackDetails": "",
-        "sourceUrl": "https://raw.githubusercontent.com/aamini7/postgres-rag-llm-demo/main/README.md",
-        "documentationUrl": "",
-        "configurations": {
-            "region": "centralus"
-        }
-    },
-    {
         "status": "active",
         "key": "azure-aks-docs/articles/aks/create-postgresql-ha.md",
         "title": "Create infrastructure for deploying a highly available PostgreSQL database on AKS",
         "description": "Create the infrastructure needed to deploy a highly available PostgreSQL database on AKS using the CloudNativePG operator.",
         "stackDetails": "",
         "sourceUrl": "https://raw.githubusercontent.com/MicrosoftDocs/executable-docs/main/scenarios/azure-aks-docs/articles/aks/create-postgresql-ha.md",
-        "documentationUrl": "",
-        "configurations": {
-        }
-    },
-    {
-        "key": "AksKaito/README.md",
-        "title": "Deploy an AI model on Azure Kubernetes Service (AKS) with the AI toolchain operator (preview)",
-        "description": "Learn how to enable the AI toolchain operator add-on on Azure Kubernetes Service (AKS) to simplify OSS AI model management and deployment.",
-        "stackDetails": "",
-        "sourceUrl": "https://raw.githubusercontent.com/MicrosoftDocs/azure-aks-docs/refs/heads/main/articles/aks/ai-toolchain-operator.md",
         "documentationUrl": "",
         "configurations": {
         }
