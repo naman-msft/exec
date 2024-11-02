@@ -124,7 +124,6 @@ Azure Database for MySQL flexible server is a managed service that you can use t
 ```bash
 export MY_MYSQL_ADMIN_USERNAME="dbadmin$RANDOM_ID"
 export MY_WP_ADMIN_PW="$(openssl rand -base64 32)"
-echo "Your MySQL user $MY_MYSQL_ADMIN_USERNAME password is: $MY_WP_ADMIN_PW" 
 ```
 
 ```bash

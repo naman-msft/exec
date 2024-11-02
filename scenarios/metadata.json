@@ -394,7 +394,21 @@
         "sourceUrl": "https://raw.githubusercontent.com/MicrosoftDocs/executable-docs/main/scenarios/ObtainPerformanceMetricsLinuxSustem/obtain-performance-metrics-linux-system.md",
         "documentationUrl": "",
         "configurations": {
-            "permissions": []
+            "permissions": [],
+            "configurableParams": [
+                    {
+                        "inputType": "textInput",
+                        "commandKey": "MY_RESOURCE_GROUP_NAME",
+                        "title": "Resource Group Name",
+                        "defaultValue": ""
+                    },
+                    {
+                        "inputType": "textInput",
+                        "commandKey": "MY_VM_NAME",
+                        "title": "VM Name",
+                        "defaultValue": ""
+                    }
+                ]
         }
     },
     {
@@ -573,9 +587,6 @@
                 "title": "Check out the KAITO GitHub repository",
                 "url": "https://github.com/Azure/kaito"
             }
-        ],
-        "configurations": {
-            "permissions": []
-        }
+        ]
     }
 ]
