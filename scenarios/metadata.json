@@ -588,5 +588,50 @@
                 "url": "https://github.com/Azure/kaito"
             }
         ]
+    },
+    {
+        "status": "active",
+        "key": "azure-aks-docs/articles/aks/trusted-access-feature.md",
+        "title": "Get secure resource access to Azure Kubernetes Service (AKS) using Trusted Access",
+        "description": "Learn how to use the Trusted Access feature to give Azure resources access to Azure Kubernetes Service (AKS) clusters.",
+        "stackDetails": "",
+        "sourceUrl": "https://raw.githubusercontent.com/MicrosoftDocs/executable-docs/main/scenarios/azure-aks-docs/articles/aks/trusted-access-feature.md",
+        "documentationUrl": "https://learn.microsoft.com/en-us/azure/aks/trusted-access-feature",
+        "nextSteps": [
+            {
+                "title": "Deploy and manage cluster extensions for AKS",
+                "url": "https://learn.microsoft.com/en-us/azure/aks/cluster-extensions"
+            },
+            {
+                "title": "Deploy the Azure Machine Learning extension on an AKS or Azure Arc–enabled Kubernetes cluster",
+                "url": "https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-kubernetes-extension"
+            },
+            {
+                "title": "Deploy Azure Backup on an AKS cluster",
+                "url": "https://learn.microsoft.com/en-us/azure/backup/azure-kubernetes-service-backup-overview"
+            },
+            {
+                "title": "Set agentless container posture in Microsoft Defender for Cloud for an AKS cluster",
+                "url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/concept-agentless-containers"
+            }
+        ],
+        "configurations": {
+            "permissions": [
+            ],
+            "configurableParams": [
+                {
+                    "inputType": "textInput",
+                    "commandKey": "RESOURCE_GROUP_NAME",
+                    "title": "Resource Group Name",
+                    "defaultValue": ""
+                },
+                {
+                    "inputType": "textInput",
+                    "commandKey": "CLUSTER_NAME",
+                    "title": "AKS Cluster Name",
+                    "defaultValue": ""
+                }
+            ]
+        }
     }
 ]
