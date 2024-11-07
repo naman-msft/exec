@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: touchserve
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: touchserve
+  template:
+    metadata:
+      labels:
+        app: touchserve
+    spec:
+      containers:
+      - name: touchserve
+        image: touchserve/llm:latest
+        ports:
+        - containerPort: 80
