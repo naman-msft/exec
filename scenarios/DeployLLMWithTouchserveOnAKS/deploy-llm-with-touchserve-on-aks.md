@@ -25,9 +25,9 @@ In this quickstart, you will learn how to deploy a large language model (LLM) us
 Create a resource group with the `az group create` command.
 
 ```bash
-export RANDOM_ID=$(openssl rand -hex 3)
+export RANDOM_ID=1f659d
 export RESOURCE_GROUP="LLMResourceGroup$RANDOM_ID"
-export LOCATION="eastus"
+export LOCATION="westus2"
 az group create --name $RESOURCE_GROUP --location $LOCATION
 ```
 
@@ -85,12 +85,6 @@ Create an AKS cluster and attach the ACR.
 
 ```bash
 export AKS_CLUSTER="LLMAKSCluster$RANDOM_ID"
-az aks create \
-    --resource-group $RESOURCE_GROUP \
-    --name $AKS_CLUSTER \
-    --node-count 1 \
-    --generate-ssh-keys \
-    --attach-acr $ACR_NAME
 ```
 
 This command may take several minutes to complete.
@@ -172,6 +166,29 @@ docker push $IMAGE_TAG
 
 ## Deploy the Docker Image to AKS
 
+### Assign the `AcrPull` Role to the AKS Cluster's Managed Identity
+
+```bash
+AKS_RESOURCE_GROUP=$RESOURCE_GROUP
+AKS_CLUSTER_NAME=$AKS_CLUSTER
+
+# Get the managed identity's object ID
+OBJECT_ID=$(az aks show \
+  --resource-group $AKS_RESOURCE_GROUP \
+  --name $AKS_CLUSTER_NAME \
+  --query "identityProfile.kubeletidentity.objectId" \
+  --output tsv)
+
+# Assign the AcrPull role using the object ID
+az role assignment create \
+  --assignee-object-id $OBJECT_ID \
+  --assignee-principal-type ServicePrincipal \
+  --role AcrPull \
+  --scope $(az acr show --name $ACR_NAME --query id --output tsv)
+```
+
+### Create a Kubernetes Deployment
+
 Create a Kubernetes deployment file named `torchserve-deployment.yaml` in the same directory and add the following content:
 
 ```yaml
@@ -231,13 +248,14 @@ kubectl apply -f torchserve-service.yaml
 Wait for the external IP to become available:
 
 ```bash
-kubectl get service torchserve-service --watch
+kubectl get service torchserve-service 
 ```
 
 Once the `EXTERNAL-IP` is assigned, you can test the deployment:
 
 ```bash
 export SERVICE_IP=$(kubectl get service torchserve-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+kubectl get service torchserve-service --watch
 curl http://$SERVICE_IP/ping
 ```
 
@@ -258,14 +276,6 @@ curl -X POST http://$SERVICE_IP/predictions/llm_model -T input.json
 ```
 
 Replace `input.json` with your input data file.
-
-## Clean Up Resources
-
-To avoid incurring charges, clean up the resources when they are no longer needed.
-
-```bash
-az group delete --name $RESOURCE_GROUP --yes --no-wait
-```
 
 ## Next Steps
 

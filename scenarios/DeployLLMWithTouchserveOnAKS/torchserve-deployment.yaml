@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: touchserve
+  name: torchserve-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: touchserve
+      app: torchserve
   template:
     metadata:
       labels:
-        app: touchserve
+        app: torchserve
     spec:
       containers:
-      - name: touchserve
-        image: touchserve/llm:latest
+      - name: torchserve-container
+        image: $IMAGE_TAG
         ports:
-        - containerPort: 80
+        - containerPort: 8080

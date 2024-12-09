@@ -78,7 +78,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "rg" {
   name     = "pg-ha-rg"
-  location = "East US"
+  location = "West Europe"
 }
 
 resource "azurerm_kubernetes_cluster" "aks" {
@@ -219,7 +219,7 @@ Results:
 ```output
 Name         ResourceGroup   Location    KubernetesVersion    ProvisioningState
 -----------  --------------- ----------- -------------------- -------------------
-pg-ha-aks   pg-ha-rg       East US     1.20.7               Succeeded
+pg-ha-aks   pg-ha-rg       West Europe     1.20.7               Succeeded
 ```
 
 
