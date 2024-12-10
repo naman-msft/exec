@@ -38,7 +38,7 @@ In order to run commands against Azure using [the CLI ](https://learn.microsoft.
 A resource group is a container for related resources. All resources must be placed in a resource group. We will create one for this tutorial. The following command creates a resource group with the previously defined $MY_RESOURCE_GROUP_NAME and $REGION parameters.
 
 ```bash
-export SUFFIX="$(openssl rand -hex 3)"
+export SUFFIX="bfa6b9"
 export MY_RESOURCE_GROUP_NAME=rg$SUFFIX
 export REGION="eastus2"
 az group create --name $MY_RESOURCE_GROUP_NAME --location $REGION
