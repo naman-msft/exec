@@ -26,8 +26,8 @@ If you choose to install and use the CLI locally, this tutorial requires that yo
 List of all the environment variables you'll need to execute this tutorial:
 
 ```bash
-export NETWORK_PREFIX="54"
-export RANDOM_ID="b80eea"
+export NETWORK_PREFIX="$(($RANDOM % 254 + 1))"
+export RANDOM_ID="$(openssl rand -hex 3)"
 export MY_RESOURCE_GROUP_NAME="myResourceGroup$RANDOM_ID"
 export MY_KEY_VAULT="mykeyvault$RANDOM_ID"
 export MY_CERT_NAME="nginxcert$RANDOM_ID"
