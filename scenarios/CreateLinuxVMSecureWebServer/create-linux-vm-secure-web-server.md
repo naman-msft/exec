@@ -26,12 +26,12 @@ If you choose to install and use the CLI locally, this tutorial requires that yo
 List of all the environment variables you'll need to execute this tutorial:
 
 ```bash
-export NETWORK_PREFIX="$(($RANDOM % 254 + 1))"
-export RANDOM_ID="$(openssl rand -hex 3)"
+export NETWORK_PREFIX="54"
+export RANDOM_ID="b80eea"
 export MY_RESOURCE_GROUP_NAME="myResourceGroup$RANDOM_ID"
 export MY_KEY_VAULT="mykeyvault$RANDOM_ID"
 export MY_CERT_NAME="nginxcert$RANDOM_ID"
-export REGION="eastus"
+export REGION="centralindia"
 export MY_VM_NAME="myVMName$RANDOM_ID"
 export MY_VM_ID_NAME="myVMIDName$RANDOM_ID"
 export MY_VM_IMAGE='Ubuntu2204'
@@ -455,6 +455,13 @@ Results:
 Now let's generate a self-signed certificate with az keyvault certificate create that uses the default certificate policy:
 
 ```bash
+az role assignment create \
+    --assignee $(az ad signed-in-user show --query userPrincipalName -o tsv) \
+    --role "Key Vault Certificates Officer" \
+    --scope $(az keyvault show --name $MY_KEY_VAULT --query id -o tsv)
+```
+
+```bash
 az keyvault certificate create \
     --vault-name $MY_KEY_VAULT \
     --name $MY_CERT_NAME \
@@ -510,93 +517,26 @@ Results:
 ```bash
 MY_VM_PRINCIPALID=$(az identity show --resource-group $MY_RESOURCE_GROUP_NAME --name $MY_VM_ID_NAME --query principalId -o tsv)
 
-az keyvault set-policy \
-    --resource-group $MY_RESOURCE_GROUP_NAME \
-    --name $MY_KEY_VAULT \
-    --object-id $MY_VM_PRINCIPALID \
-    --secret-permissions get list \
-    --certificate-permissions get list -o JSON
-```
+# az keyvault set-policy \
+#     --resource-group $MY_RESOURCE_GROUP_NAME \
+#     --name $MY_KEY_VAULT \
+#     --object-id $MY_VM_PRINCIPALID \
+#     --secret-permissions get list \
+#     --certificate-permissions get list -o JSON
 
-Results:
+KEYVAULT_ID=$(az keyvault show --name $MY_KEY_VAULT --query id -o tsv)
 
-<!-- expected_similarity=0.3 -->
-```JSON
-{
-  "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroupb1404f/providers/Microsoft.KeyVault/vaults/myKeyVaultb1404f",
-  "location": "eastus",
-  "name": "myKeyVaultb1404f",
-  "properties": {
-    "accessPolicies": [
-      {
-        "applicationId": null,
-        "objectId": "ceeb4e98-5831-4d9f-b8ba-2ee14b3cdf80",
-        "permissions": {
-          "certificates": [
-            "all"
-          ],
-          "keys": [
-            "all"
-          ],
-          "secrets": [
-            "all"
-          ],
-          "storage": [
-            "all"
-          ]
-        },
-        "tenantId": "bd7153ee-d085-4a28-a928-2f0ef402f076"
-      },
-      {
-        "applicationId": null,
-        "objectId": "e09ebfce-97f0-4aff-9abd-415ebd6f915c",
-        "permissions": {
-          "certificates": [
-            "list",
-            "get"
-          ],
-          "keys": null,
-          "secrets": [
-            "list",
-            "get"
-          ],
-          "storage": null
-        },
-        "tenantId": "bd7153ee-d085-4a28-a928-2f0ef402f076"
-      }
-    ],
-    "createMode": null,
-    "enablePurgeProtection": null,
-    "enableRbacAuthorization": null,
-    "enableSoftDelete": true,
-    "enabledForDeployment": true,
-    "enabledForDiskEncryption": null,
-    "enabledForTemplateDeployment": null,
-    "hsmPoolResourceId": null,
-    "networkAcls": null,
-    "privateEndpointConnections": null,
-    "provisioningState": "Succeeded",
-    "publicNetworkAccess": "Enabled",
-    "sku": {
-      "family": "A",
-      "name": "standard"
-    },
-    "softDeleteRetentionInDays": 7,
-    "tenantId": "bd7153ee-d085-4a28-a928-2f0ef402f076",
-    "vaultUri": "https://mykeyvaultb1404f.vault.azure.net/"
-  },
-  "resourceGroup": "myResourceGroupb1404f",
-  "systemData": {
-    "createdAt": "2023-09-18T12:25:55.208000+00:00",
-    "createdBy": "ajoian@microsoft.com",
-    "createdByType": "User",
-    "lastModifiedAt": "2023-09-18T12:48:08.966000+00:00",
-    "lastModifiedBy": "ajoian@microsoft.com",
-    "lastModifiedByType": "User"
-  },
-  "tags": {},
-  "type": "Microsoft.KeyVault/vaults"
-}
+az role assignment create \
+    --assignee-object-id $MY_VM_PRINCIPALID \
+    --assignee-principal-type ServicePrincipal \
+    --role "Key Vault Secrets User" \
+    --scope $KEYVAULT_ID
+
+az role assignment create \
+    --assignee-object-id $MY_VM_PRINCIPALID \
+    --assignee-principal-type ServicePrincipal \
+    --role "Key Vault Certificates Officer" \
+    --scope $KEYVAULT_ID
 ```
 
 ## Create the VM
