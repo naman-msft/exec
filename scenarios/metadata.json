@@ -651,5 +651,31 @@
                 }
             ]
         }
+    },
+    {
+        "status": "inactive",
+        "key": "CreateLinuxVMSecureWebServer/create-linux-vm-secure-web-server.md",
+        "title": "Create a NGINX Webserver Secured via HTTPS",
+        "description": "This tutorial shows how to create a NGINX Webserver Secured via HTTPS.",
+        "stackDetails": [
+        ],
+        "sourceUrl": "https://raw.githubusercontent.com/MicrosoftDocs/executable-docs/main/scenarios/CreateLinuxVMSecureWebServer/create-linux-vm-secure-web-server.md",
+        "documentationUrl": "",
+        "nextSteps": [
+            {
+                "title": "Learn about virtual machines",
+                "url": "https://learn.microsoft.com/en-us/azure/virtual-machines/"
+            },
+            {
+                "title": "Create and manage Linux VMs with the Azure CLI",
+                "url": "https://learn.microsoft.com/en-us/azure/virtual-machines/linux/tutorial-manage-vm"
+            },
+            {
+                "title": "Secure your Linux VM",
+                "url": "https://learn.microsoft.com/en-us/azure/virtual-machines/linux/tutorial-secure-vm"
+            }
+        ],
+        "configurations": {
+        }
     }
 ]

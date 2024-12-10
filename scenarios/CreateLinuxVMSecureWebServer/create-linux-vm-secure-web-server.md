@@ -21,40 +21,15 @@ To secure web servers, a Transport Layer Security (TLS), previously known as Sec
 
 If you choose to install and use the CLI locally, this tutorial requires that you're running the Azure CLI version 2.0.30 or later. Run `az --version` to find the version. If you need to install or upgrade, see [Install Azure CLI]( https://learn.microsoft.com//cli/azure/install-azure-cli ).
 
-## Variable Declaration
-
-List of all the environment variables you'll need to execute this tutorial:
-
-```bash
-export NETWORK_PREFIX="$(($RANDOM % 254 + 1))"
-export RANDOM_ID="$(openssl rand -hex 3)"
-export MY_RESOURCE_GROUP_NAME="myResourceGroup$RANDOM_ID"
-export MY_KEY_VAULT="mykeyvault$RANDOM_ID"
-export MY_CERT_NAME="nginxcert$RANDOM_ID"
-export REGION="centralindia"
-export MY_VM_NAME="myVMName$RANDOM_ID"
-export MY_VM_ID_NAME="myVMIDName$RANDOM_ID"
-export MY_VM_IMAGE='Ubuntu2204'
-export MY_VM_USERNAME="azureuser"
-export MY_VM_SIZE='Standard_DS2_v2'
-export MY_VNET_NAME="myVNet$RANDOM_ID"
-export MY_VM_NIC_NAME="myVMNicName$RANDOM_ID"
-export MY_NSG_SSH_RULE="Allow-Access$RANDOM_ID"
-export MY_VM_NIC_NAME="myVMNicName$RANDOM_ID"
-export MY_VNET_PREFIX="10.$NETWORK_PREFIX.0.0/16"
-export MY_SN_NAME="mySN$RANDOM_ID"
-export MY_SN_PREFIX="10.$NETWORK_PREFIX.0.0/24"
-export MY_PUBLIC_IP_NAME="myPublicIP$RANDOM_ID"
-export MY_DNS_LABEL="mydnslabel$RANDOM_ID"
-export MY_NSG_NAME="myNSGName$RANDOM_ID"
-export FQDN="${MY_DNS_LABEL}.${REGION}.cloudapp.azure.com"
-```
-
 ## Create a Resource Group
 
 Before you can create a secure Linux VM, create a resource group with az group create. The following example creates a resource group equal to the contents of the variable *MY_RESOURCE_GROUP_NAME* in the location specified by the variable contents *REGION*:
 
 ```bash
+export RANDOM_ID="$(openssl rand -hex 3)"
+export MY_RESOURCE_GROUP_NAME="myResourceGroup$RANDOM_ID"
+export REGION="centralindia"
+
 az group create \
     --name $MY_RESOURCE_GROUP_NAME \
     --location $REGION -o JSON
@@ -66,7 +41,7 @@ Results:
 ```JSON
 {
   "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroupb1404f",
-  "location": "eastus",
+  "location": "centralindia",
   "managedBy": null,
   "name": "myResourceGroupb1404f",
   "properties": {
@@ -82,6 +57,12 @@ Results:
 Use az network vnet create to create a virtual network named *$MY_VNET_NAME* with a subnet named *$MY_SN_NAME*in the *$MY_RESOURCE_GROUP_NAME*resource group.
 
 ```bash
+export NETWORK_PREFIX="$(($RANDOM % 254 + 1))"
+export MY_VNET_NAME="myVNet$RANDOM_ID"
+export MY_VNET_PREFIX="10.$NETWORK_PREFIX.0.0/16"
+export MY_SN_NAME="mySN$RANDOM_ID"
+export MY_SN_PREFIX="10.$NETWORK_PREFIX.0.0/24"
+
 az network vnet create \
     --resource-group $MY_RESOURCE_GROUP_NAME \
     --name $MY_VNET_NAME \
@@ -155,6 +136,9 @@ Results:
 Use az network public-ip create to create a standard zone-redundant public IPv4 address named *$MY_PUBLIC_IP_NAME* in *$MY_RESOURCE_GROUP_NAME*.
 
 ```bash
+export MY_PUBLIC_IP_NAME="myPublicIP$RANDOM_ID"
+export MY_DNS_LABEL="mydnslabel$RANDOM_ID"
+
 az network public-ip create \
     --name $MY_PUBLIC_IP_NAME \
     --location $REGION \
@@ -214,6 +198,8 @@ Results:
 Security rules in network security groups enable you to filter the type of network traffic that can flow in and out of virtual network subnets and network interfaces. To learn more about network security groups, see [Network security group overview](https://learn.microsoft.com/azure/virtual-network/network-security-groups-overview).
 
 ```bash
+export MY_NSG_NAME="myNSGName$RANDOM_ID"
+
 az network nsg create \
     --resource-group $MY_RESOURCE_GROUP_NAME \
     --name $MY_NSG_NAME \
@@ -262,6 +248,8 @@ Results:
 Open ports 22 (SSH), 80 (HTTP) and 443 (HTTPS) to allow SSH and Web traffic
 
 ```bash
+export MY_NSG_SSH_RULE="Allow-Access$RANDOM_ID"
+
 az network nsg rule create \
     --resource-group $MY_RESOURCE_GROUP_NAME \
     --nsg-name $MY_NSG_NAME \
@@ -311,6 +299,8 @@ Results:
 And finally create the Network Interface Card (NIC):
 
 ```bash
+export MY_VM_NIC_NAME="myVMNicName$RANDOM_ID"
+
 az network nic create \
     --resource-group $MY_RESOURCE_GROUP_NAME \
     --name $MY_VM_NIC_NAME \
@@ -379,6 +369,8 @@ Azure Key Vault safeguards cryptographic keys and secrets, such as certificates 
 The following example creates an Azure Key Vault named *$MY_KEY_VAULT* in the chosen region *$REGION* with a retention policy of 7 days. This means once a secret, key, certificate, or key vault is deleted, it will remain recoverable for a configurable period of 7 to 90 calendar days.
 
 ```bash
+export MY_KEY_VAULT="mykeyvault$RANDOM_ID"
+
 az keyvault create \
     --resource-group $MY_RESOURCE_GROUP_NAME \
     --name $MY_KEY_VAULT \
@@ -455,13 +447,8 @@ Results:
 Now let's generate a self-signed certificate with az keyvault certificate create that uses the default certificate policy:
 
 ```bash
-az role assignment create \
-    --assignee $(az ad signed-in-user show --query userPrincipalName -o tsv) \
-    --role "Key Vault Certificates Officer" \
-    --scope $(az keyvault show --name $MY_KEY_VAULT --query id -o tsv)
-```
+export MY_CERT_NAME="nginxcert$RANDOM_ID"
 
-```bash
 az keyvault certificate create \
     --vault-name $MY_KEY_VAULT \
     --name $MY_CERT_NAME \
@@ -492,6 +479,8 @@ Results:
 Finally, we need to prepare the certificate so it can be used during the VM create process. To do so we need to obtain the ID of the certificate with az keyvault secret list-versions, and convert the certificate with az vm secret format. The following example assigns the output of these commands to variables for ease of use in the next steps:
 
 ```bash
+export MY_VM_ID_NAME="myVMIDName$RANDOM_ID"
+
 az identity create \
     --resource-group $MY_RESOURCE_GROUP_NAME \
     --name $MY_VM_ID_NAME -o JSON
@@ -517,26 +506,93 @@ Results:
 ```bash
 MY_VM_PRINCIPALID=$(az identity show --resource-group $MY_RESOURCE_GROUP_NAME --name $MY_VM_ID_NAME --query principalId -o tsv)
 
-# az keyvault set-policy \
-#     --resource-group $MY_RESOURCE_GROUP_NAME \
-#     --name $MY_KEY_VAULT \
-#     --object-id $MY_VM_PRINCIPALID \
-#     --secret-permissions get list \
-#     --certificate-permissions get list -o JSON
+az keyvault set-policy \
+    --resource-group $MY_RESOURCE_GROUP_NAME \
+    --name $MY_KEY_VAULT \
+    --object-id $MY_VM_PRINCIPALID \
+    --secret-permissions get list \
+    --certificate-permissions get list -o JSON
+```
 
-KEYVAULT_ID=$(az keyvault show --name $MY_KEY_VAULT --query id -o tsv)
+Results:
 
-az role assignment create \
-    --assignee-object-id $MY_VM_PRINCIPALID \
-    --assignee-principal-type ServicePrincipal \
-    --role "Key Vault Secrets User" \
-    --scope $KEYVAULT_ID
-
-az role assignment create \
-    --assignee-object-id $MY_VM_PRINCIPALID \
-    --assignee-principal-type ServicePrincipal \
-    --role "Key Vault Certificates Officer" \
-    --scope $KEYVAULT_ID
+<!-- expected_similarity=0.3 -->
+```JSON
+{
+  "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroupb1404f/providers/Microsoft.KeyVault/vaults/myKeyVaultb1404f",
+  "location": "eastus",
+  "name": "myKeyVaultb1404f",
+  "properties": {
+    "accessPolicies": [
+      {
+        "applicationId": null,
+        "objectId": "ceeb4e98-5831-4d9f-b8ba-2ee14b3cdf80",
+        "permissions": {
+          "certificates": [
+            "all"
+          ],
+          "keys": [
+            "all"
+          ],
+          "secrets": [
+            "all"
+          ],
+          "storage": [
+            "all"
+          ]
+        },
+        "tenantId": "bd7153ee-d085-4a28-a928-2f0ef402f076"
+      },
+      {
+        "applicationId": null,
+        "objectId": "e09ebfce-97f0-4aff-9abd-415ebd6f915c",
+        "permissions": {
+          "certificates": [
+            "list",
+            "get"
+          ],
+          "keys": null,
+          "secrets": [
+            "list",
+            "get"
+          ],
+          "storage": null
+        },
+        "tenantId": "bd7153ee-d085-4a28-a928-2f0ef402f076"
+      }
+    ],
+    "createMode": null,
+    "enablePurgeProtection": null,
+    "enableRbacAuthorization": null,
+    "enableSoftDelete": true,
+    "enabledForDeployment": true,
+    "enabledForDiskEncryption": null,
+    "enabledForTemplateDeployment": null,
+    "hsmPoolResourceId": null,
+    "networkAcls": null,
+    "privateEndpointConnections": null,
+    "provisioningState": "Succeeded",
+    "publicNetworkAccess": "Enabled",
+    "sku": {
+      "family": "A",
+      "name": "standard"
+    },
+    "softDeleteRetentionInDays": 7,
+    "tenantId": "bd7153ee-d085-4a28-a928-2f0ef402f076",
+    "vaultUri": "https://mykeyvaultb1404f.vault.azure.net/"
+  },
+  "resourceGroup": "myResourceGroupb1404f",
+  "systemData": {
+    "createdAt": "2023-09-18T12:25:55.208000+00:00",
+    "createdBy": "ajoian@microsoft.com",
+    "createdByType": "User",
+    "lastModifiedAt": "2023-09-18T12:48:08.966000+00:00",
+    "lastModifiedBy": "ajoian@microsoft.com",
+    "lastModifiedByType": "User"
+  },
+  "tags": {},
+  "type": "Microsoft.KeyVault/vaults"
+}
 ```
 
 ## Create the VM
@@ -546,6 +602,8 @@ Cloud-init is a widely used approach to customize a Linux VM as it boots for the
 When you create a VM, certificates and keys are stored in the protected /var/lib/waagent/ directory. In this example, we are installing and configuring the NGINX web server.
 
 ```bash
+export FQDN="${MY_DNS_LABEL}.${REGION}.cloudapp.azure.com"
+
 cat > cloud-init-nginx.txt <<EOF
 #cloud-config
 
@@ -607,6 +665,10 @@ The following example creates a VM named *myVMName$UNIQUE_POSTFIX*:
 
 ```bash
 MY_VM_ID=$(az identity show --resource-group $MY_RESOURCE_GROUP_NAME --name $MY_VM_ID_NAME --query id -o tsv)
+export MY_VM_NAME="myVMName$RANDOM_ID"
+export MY_VM_IMAGE='Ubuntu2204'
+export MY_VM_USERNAME="azureuser"
+export MY_VM_SIZE='Standard_DS2_v2'
 
 az vm create \
     --resource-group $MY_RESOURCE_GROUP_NAME \
