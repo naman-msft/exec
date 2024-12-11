@@ -320,27 +320,25 @@ The following example shows how to use the Azure role-based access control (Azur
 1. Deploy a pod that references the service account and key vault URL:
 
     ```bash
-    cat <<EOF | kubectl apply -f -
     apiVersion: v1
     kind: Pod
     metadata:
-    name: sample-workload-identity-key-vault
-    namespace: ${SERVICE_ACCOUNT_NAMESPACE}
-    labels:
-        azure.workload.identity/use: "true"
+        name: sample-workload-identity-key-vault
+        namespace: ${SERVICE_ACCOUNT_NAMESPACE}
+        labels:
+            azure.workload.identity/use: "true"
     spec:
-    serviceAccountName: ${SERVICE_ACCOUNT_NAME}
-    containers:
-        - image: ghcr.io/azure/azure-workload-identity/msal-go
-        name: oidc
-        env:
-            - name: KEYVAULT_URL
-            value: ${KEYVAULT_URL}
-            - name: SECRET_NAME
-            value: ${KEYVAULT_SECRET_NAME}
-    nodeSelector:
-        kubernetes.io/os: linux
-    EOF
+        serviceAccountName: ${SERVICE_ACCOUNT_NAME}
+        containers:
+            - image: ghcr.io/azure/azure-workload-identity/msal-go
+              name: oidc
+              env:
+                - name: KEYVAULT_URL
+                  value: ${KEYVAULT_URL}
+                - name: SECRET_NAME
+                  value: ${KEYVAULT_SECRET_NAME}
+        nodeSelector:
+            kubernetes.io/os: linux
     ```
 
 To check whether all properties are injected properly by the webhook, use the [kubectl describe][kubectl-describe] command:
