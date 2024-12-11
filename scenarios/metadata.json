@@ -677,5 +677,27 @@
         ],
         "configurations": {
         }
+    },
+    {
+        "status": "inactive",
+        "key": "azure-docs/articles/confidential-computing/confidential-enclave-nodes-aks-get-started.md",
+        "title": "Quickstart: Deploy an AKS cluster with confidential computing Intel SGX agent nodes by using the Azure CLI",
+        "description": "Learn how to create an Azure Kubernetes Service (AKS) cluster with enclave confidential containers a Hello World app by using the Azure CLI.",
+        "stackDetails": [],
+        "sourceUrl": "https://raw.githubusercontent.com/MicrosoftDocs/executable-docs/main/scenarios/azure-docs/articles/confidential-computing/confidential-enclave-nodes-aks-get-started.md",
+        "documentationUrl": "",
+        "nextSteps": [
+            {
+                "title": "Samples to run Python, Node, and other applications through confidential containers",
+                "url": "https://github.com/Azure-Samples/confidential-container-samples"
+            },
+            {
+                "title": "Enclave-aware Azure container samples in GitHub",
+                "url": "https://github.com/Azure-Samples/confidential-computing/blob/main/containersamples/"
+            }
+        ],
+        "configurations": {
+            "permissions": []
+        }
     }
 ]
