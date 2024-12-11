@@ -83,15 +83,7 @@ After a few minutes, the command completes and returns JSON-formatted informatio
 
 ## Update an existing AKS cluster
 
-You can update an AKS cluster to use the OIDC issuer and enable workload identity by calling the [az aks update][az aks update] command with the `--enable-oidc-issuer` and the `--enable-workload-identity` parameters. The following example updates an existing cluster:
-
-```azurecli-interactive
-az aks update \
-    --resource-group "${RESOURCE_GROUP}" \
-    --name "${CLUSTER_NAME}" \
-    --enable-oidc-issuer \
-    --enable-workload-identity
-```
+You can update an AKS cluster to use the OIDC issuer and enable workload identity by calling the [az aks update][az aks update] command with the `--enable-oidc-issuer` and the `--enable-workload-identity` parameters. 
 
 ## Retrieve the OIDC issuer URL
 
