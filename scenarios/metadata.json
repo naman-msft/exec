@@ -479,7 +479,7 @@
     },
     {
         "status": "active",
-        "key": "DeployHAPGonARO/deploy-ha-pg-aro.md",
+        "key": "DeployHAPGonARO/deploy-ha-pg-on-aro.md",
         "title": "Create a Highly Available PostgreSQL Cluster on Azure Red Hat OpenShift",
         "description": "This tutorial shows how to create a Highly Available PostgreSQL cluster on Azure Red Hat OpenShift (ARO) using the CloudNativePG operator",
         "stackDetails": "",
