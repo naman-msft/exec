@@ -274,11 +274,11 @@ The following example shows how to use the Azure role-based access control (Azur
         --query id \
         --output tsv)
 
-    export CALLER_OBJECT_ID=$(az ad signed-in-user show --query objectId -o tsv)
+    export CALLER_OBJECT_ID=$(az ad signed-in-user show --query id -o tsv)
 
     az role assignment create --assignee "${CALLER_OBJECT_ID}" \
-    --role "Key Vault Secrets Officer" \
-    --scope "${KEYVAULT_RESOURCE_ID}"
+        --role "Key Vault Secrets Officer" \
+        --scope "${KEYVAULT_RESOURCE_ID}"
     ```
 
 1. Create a secret in the key vault:

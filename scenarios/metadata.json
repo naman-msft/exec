@@ -369,11 +369,11 @@
     },
     {
         "status": "active",
-        "key": "WorkloadIdentityAKS/workload-identity-aks.md",
+        "key": "azure-aks-docs/articles/aks/workload-identity-deploy-cluster.md",
         "title": "Deploy and configure an AKS cluster with workload identity",
         "description": "In this Azure Kubernetes Service (AKS) article, you deploy an Azure Kubernetes Service cluster and configure it with a Microsoft Entra Workload ID.",
         "stackDetails": [],
-        "sourceUrl": "https://raw.githubusercontent.com/MicrosoftDocs/executable-docs/main/scenarios/WorkloadIdentityAKS/workload-identity-aks.md",
+        "sourceUrl": "https://raw.githubusercontent.com/MicrosoftDocs/executable-docs/main/scenarios/azure-aks-docs/articles/aks/workload-identity-deploy-cluster.md",
         "documentationUrl": "",
         "nextSteps": [
             {
