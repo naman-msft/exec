@@ -312,6 +312,7 @@ The following example shows how to use the Azure role-based access control (Azur
 1. Deploy a pod that references the service account and key vault URL:
 
     ```bash
+    kubectl apply -f - <<EOF
     apiVersion: v1
     kind: Pod
     metadata:
@@ -322,18 +323,23 @@ The following example shows how to use the Azure role-based access control (Azur
     spec:
         serviceAccountName: ${SERVICE_ACCOUNT_NAME}
         containers:
-            - image: ghcr.io/azure/azure-workload-identity/msal-go
-              name: oidc
-              env:
-                - name: KEYVAULT_URL
-                  value: ${KEYVAULT_URL}
-                - name: SECRET_NAME
-                  value: ${KEYVAULT_SECRET_NAME}
+          - image: ghcr.io/azure/azure-workload-identity/msal-go
+            name: oidc
+            env:
+              - name: KEYVAULT_URL
+                value: ${KEYVAULT_URL}
+              - name: SECRET_NAME
+                value: ${KEYVAULT_SECRET_NAME}
         nodeSelector:
             kubernetes.io/os: linux
+    EOF
     ```
 
 To check whether all properties are injected properly by the webhook, use the [kubectl describe][kubectl-describe] command:
+
+```azurecli-interactive
+kubectl wait --namespace ${SERVICE_ACCOUNT_NAMESPACE} --for=condition=Ready pod/sample-workload-identity-key-vault --timeout=120s
+```
 
 ```azurecli-interactive
 kubectl describe pod sample-workload-identity-key-vault | grep "SECRET_NAME:"
@@ -362,14 +368,7 @@ I0114 10:35:09.795900       1 main.go:63] "successfully got secret" secret="Hell
 
 ## Disable workload identity
 
-To disable the Microsoft Entra Workload ID on the AKS cluster where it's been enabled and configured, you can run the following command:
-
-```azurecli-interactive
-az aks update \
-    --resource-group "${RESOURCE_GROUP}" \
-    --name "${CLUSTER_NAME}" \
-    --disable-workload-identity
-```
+To disable the Microsoft Entra Workload ID on the AKS cluster where it's been enabled and configured, update the AKS cluster by setting the `--disable-workload-identity` parameter using the `az aks update` command.
 
 ## Next steps
 
