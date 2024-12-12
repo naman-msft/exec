@@ -699,5 +699,24 @@
         "configurations": {
             "permissions": []
         }
+    },
+    {
+        "status": "inactive",
+        "key": "azure-docs/articles/azure-linux/quickstart-azure-cli.md",
+        "title": "Quickstart: Deploy an Azure Linux Container Host for AKS cluster by using the Azure CLI",
+        "description": "Learn how to quickly create an Azure Linux Container Host for AKS cluster using the Azure CLI.",
+        "stackDetails": [],
+        "sourceUrl": "https://raw.githubusercontent.com/MicrosoftDocs/executable-docs/main/scenarios/azure-docs/articles/azure-linux/quickstart-azure-cli.md",
+        "documentationUrl": "",
+        "nextSteps": [
+            {
+                "title": "Azure Linux Container Host tutorial",
+                "url": "https://github.com/MicrosoftDocs/azure-management-docs/blob/main/articles/azure-linux/tutorial-azure-linux-create-cluster.md"
+            }
+            
+        ],
+        "configurations": {
+            "permissions": []
+        }
     }
 ]
