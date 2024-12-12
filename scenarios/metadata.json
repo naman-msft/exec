@@ -718,5 +718,24 @@
         "configurations": {
             "permissions": []
         }
+    },
+    {
+        "status": "inactive",
+        "key": "azure-compute-docs/articles/virtual-machine-scale-sets/tutorial-use-custom-image-cli.md",
+        "title": "Tutorial - Use a custom VM image in a scale set with Azure CLI",
+        "description": "Learn how to use the Azure CLI to create a custom VM image that you can use to deploy a Virtual Machine Scale Set",
+        "stackDetails": [],
+        "sourceUrl": "https://raw.githubusercontent.com/MicrosoftDocs/executable-docs/main/scenarios/azure-compute-docs/articles/virtual-machine-scale-sets/tutorial-use-custom-image-cli.md",
+        "documentationUrl": "",
+        "nextSteps": [
+            {
+                "title": "Deploy applications to your scale sets",
+                "url": "https://learn.microsoft.com/en-us/azure/virtual-machine-scale-sets/tutorial-install-apps-cli"
+            }
+            
+        ],
+        "configurations": {
+            "permissions": []
+        }
     }
 ]
