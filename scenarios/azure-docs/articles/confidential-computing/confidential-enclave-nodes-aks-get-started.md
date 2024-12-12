@@ -48,7 +48,7 @@ Intel SGX AKS Addon "confcom" exposes the Intel SGX device drivers to your conta
 First, create a resource group for the cluster by using the `az group create` command.
 
 ```bash
-export RANDOM_SUFFIX=$(openssl rand -hex 3)
+export RANDOM_SUFFIX="$(openssl rand -hex 3)"
 export RESOURCE_GROUP="myResourceGroup$RANDOM_SUFFIX"
 export LOCATION="eastus2"
 az group create --name $RESOURCE_GROUP --location $LOCATION
@@ -124,50 +124,15 @@ This section assumes you're already running an AKS cluster that meets the prereq
 
 ### Enable the confidential computing AKS add-on on the existing cluster
 
-Run the following command to enable the confidential computing add-on:
-
-```bash
-export EXISTING_AKS_CLUSTER="MyManagedCluster$RANDOM_SUFFIX"
-az aks enable-addons --addons confcom --name $EXISTING_AKS_CLUSTER --resource-group $RESOURCE_GROUP
-```
+To enable the confidential computing add-on, use the `az aks enable-addons` command with the `confcom` add-on, specifying your existing AKS cluster name and resource group.
 
 ### Add a DCsv3 user node pool to the cluster
-
 > [!NOTE]
 > To use the confidential computing capability, your existing AKS cluster needs to have a minimum of one node pool that's based on a DCsv2/DCsv3 VM SKU. To learn more about DCsv2/DCsv3 VM SKUs for confidential computing, see the available SKUs and supported regions.
 
-Run the following command to create a node pool:
+To create a node pool, add a new node pool to your existing AKS cluster with the name *confcompool1*. Ensure that this node pool has two nodes and uses the `Standard_DC4s_v3` VM size.
 
-```bash
-az aks nodepool add --cluster-name $EXISTING_AKS_CLUSTER --name confcompool1 --resource-group $RESOURCE_GROUP --node-count 2 --node-vm-size Standard_DC4s_v3
-```
-
-Verify that the new node pool with the name *confcompool1* has been created:
-
-```bash
-az aks nodepool list --cluster-name $EXISTING_AKS_CLUSTER --resource-group $RESOURCE_GROUP
-```
-
-Results:
-
-<!-- expected_similarity=0.3 -->
-
-```json
-[
-  {
-    "agentPoolType": "VirtualMachineScaleSets",
-    "availabilityZones": null,
-    "count": 2,
-    "currentOrchestratorVersion": "x.x.x",
-    "enableAutoScaling": false,
-    "enableNodePublicIp": false,
-    "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroupxxxxxx/providers/Microsoft.ContainerService/managedClusters/MyManagedClusterxxxxxx/agentPools/confcompool1",
-    "name": "confcompool1",
-    "nodeSize": "Standard_DC4s_v3",
-    ...
-  }
-]
-```
+Verify that the new node pool with the name *confcompool1* has been created by listing the node pools in your AKS cluster.
 
 ### Verify that DaemonSets are running on confidential node pools
 
