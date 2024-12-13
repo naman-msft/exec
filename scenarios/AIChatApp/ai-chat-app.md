@@ -1,139 +1,317 @@
-# Create an Azure OpenAI, LangChain, ChromaDB, and Chainlit Chat App in Container Apps
+---
+title: 'Tutorial: Implement RAG on Azure Cognitive Services with a Chat Interface'
+description: Learn how to implement Retrieval-Augmented Generation (RAG) using Azure Cognitive Services, LangChain, ChromaDB, and Chainlit, and deploy it in Azure Container Apps.
+ms.topic: tutorial
+ms.date: 10/10/2023
+author: GitHubCopilot
+ms.author: GitHubCopilot
+ms.custom: innovation-engine
+---
 
-This guide will walk you through the steps to create an Azure OpenAI, LangChain, ChromaDB, and Chainlit Chat App in Azure Container Apps.
+# Tutorial: Implement RAG on Azure Cognitive Services with a Chat Interface
+
+This tutorial will guide you through the steps to implement Retrieval-Augmented Generation (RAG) using Azure Cognitive Services, LangChain, ChromaDB, and Chainlit, and deploy it in Azure Container Apps.
 
 ## Prerequisites
 
 - An Azure account with an active subscription.
 - Azure CLI installed on your local machine.
 - Docker installed on your local machine.
+- Python 3.9 or higher installed on your local machine.
 
 ## Step 1: Create an Azure OpenAI Service
 
-1. **Create a Resource Group**:
-    ```azurecli-interactive
-    az group create --name myResourceGroup --location eastus
-    ```
+1. **Create a Resource Group**
 
-2. **Create an Azure OpenAI Service**:
-    ```azurecli-interactive
-    az cognitiveservices account create \
-        --name myOpenAIService \
-        --resource-group myResourceGroup \
-        --kind OpenAI \
-        --sku S0 \
-        --location eastus \
-        --yes
-    ```
+   Set the following environment variables:
 
-## Step 2: Set Up LangChain and ChromaDB
+   ```bash
+   export RANDOM_SUFFIX=$(openssl rand -hex 3)
+   export RESOURCE_GROUP="myResourceGroup$RANDOM_SUFFIX"
+   export LOCATION="eastus"
+   ```
 
-1. **Create a Dockerfile**:
-    Create a `Dockerfile` to set up LangChain and ChromaDB.
+   Create the resource group:
 
-    ```dockerfile
-    # Use an official Python runtime as a parent image
-    FROM python:3.9-slim
+   ```azurecli-interactive
+   az group create --name $RESOURCE_GROUP --location $LOCATION
+   ```
 
-    # Set the working directory in the container
-    WORKDIR /app
+   Results:
 
-    # Copy the current directory contents into the container at /app
-    COPY . /app
+   <!-- expected_similarity=0.3 -->
 
-    # Install any needed packages specified in requirements.txt
-    RUN pip install --no-cache-dir -r requirements.txt
+   ```JSON
+   {
+     "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroupxxx",
+     "location": "eastus",
+     "managedBy": null,
+     "name": "myResourceGroupxxx",
+     "properties": {
+       "provisioningState": "Succeeded"
+     },
+     "tags": null,
+     "type": "Microsoft.Resources/resourceGroups"
+   }
+   ```
 
-    # Make port 80 available to the world outside this container
-    EXPOSE 80
+2. **Create an Azure OpenAI Service**
 
-    # Define environment variable
-    ENV NAME World
+   Set the following environment variable:
 
-    # Run app.py when the container launches
-    CMD ["python", "app.py"]
-    ```
+   ```bash
+   export OPENAI_SERVICE_NAME="myOpenAIService$RANDOM_SUFFIX"
+   ```
 
-2. **Create a `requirements.txt` file**:
-    List the dependencies for LangChain and ChromaDB.
+   Create the Azure OpenAI Service:
 
-    ```plaintext
-    langchain
-    chromadb
-    chainlit
-    azure-openai
-    ```
+   ```azurecli-interactive
+   az cognitiveservices account create \
+     --name $OPENAI_SERVICE_NAME \
+     --resource-group $RESOURCE_GROUP \
+     --kind OpenAI \
+     --sku S0 \
+     --location $LOCATION \
+     --yes
+   ```
 
-3. **Create an `app.py` file**:
-    Set up a basic Chainlit app using LangChain and ChromaDB.
+## Step 2: Set Up LangChain, ChromaDB, and Prepare the Data
 
-    ```python
-    from langchain import LangChain
-    from chromadb import ChromaDB
-    from chainlit import Chainlit
+1. **Create a Working Directory**
 
-    # Initialize LangChain
-    langchain = LangChain()
+   ```bash
+   mkdir rag-chat-app
+   cd rag-chat-app
+   ```
 
-    # Initialize ChromaDB
-    chromadb = ChromaDB()
+2. **Create a Virtual Environment**
 
-    # Initialize Chainlit
-    chainlit = Chainlit(langchain, chromadb)
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
 
-    # Define a simple chat endpoint
-    @chainlit.route('/chat', methods=['POST'])
-    def chat():
-        user_input = request.json.get('input')
-        response = chainlit.chat(user_input)
-        return jsonify({'response': response})
+3. **Create a `requirements.txt` File**
 
-    if __name__ == '__main__':
-        chainlit.run(host='0.0.0.0', port=80)
-    ```
+   ```plaintext
+   langchain
+   chromadb
+   chainlit
+   openai
+   tiktoken
+   ```
 
-## Step 3: Build and Push the Docker Image
+4. **Install the Dependencies**
 
-1. **Build the Docker Image**:
-    ```bash
-    docker build -t mychainlitapp .
-    ```
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-2. **Push the Docker Image to Azure Container Registry**:
-    ```azurecli-interactive
-    az acr create --resource-group myResourceGroup --name myContainerRegistry --sku Basic
-    az acr login --name myContainerRegistry
-    docker tag mychainlitapp mycontainerregistry.azurecr.io/mychainlitapp:v1
-    docker push mycontainerregistry.azurecr.io/mychainlitapp:v1
-    ```
+5. **Prepare the Data**
 
-## Step 4: Deploy to Azure Container Apps
+   Create a `documents.txt` file with sample content:
 
-1. **Create a Container App Environment**:
-    ```azurecli-interactive
-    az containerapp env create --name myContainerAppEnv --resource-group myResourceGroup --location eastus
-    ```
+   ```bash
+   echo "Azure Cognitive Services provide AI capabilities for developers to build intelligent applications." > documents.txt
+   ```
 
-2. **Deploy the Container App**:
-    ```azurecli-interactive
-    az containerapp create \
-        --name myChainlitApp \
-        --resource-group myResourceGroup \
-        --environment myContainerAppEnv \
-        --image mycontainerregistry.azurecr.io/mychainlitapp:v1 \
-        --target-port 80 \
-        --ingress 'external' \
-        --cpu 0.5 --memory 1.0Gi
-    ```
+6. **Create an `app.py` File**
 
-## Step 5: Test the Deployment
+   ```python
+   import os
+   from langchain.document_loaders import TextLoader
+   from langchain.indexes import VectorstoreIndexCreator
+   from langchain.chains import ConversationalRetrievalChain
+   from langchain.embeddings import OpenAIEmbeddings
+   from langchain.llms import OpenAI
+   import chainlit as cl
 
-1. **Get the URL of the Container App**:
-    ```azurecli-interactive
-    az containerapp show --name myChainlitApp --resource-group myResourceGroup --query properties.configuration.ingress.fqdn
-    ```
+   # Set Azure OpenAI API credentials
+   os.environ["OPENAI_API_TYPE"] = "azure"
+   os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+   os.environ["OPENAI_API_BASE"] = os.getenv("OPENAI_API_BASE")
+   os.environ["OPENAI_API_VERSION"] = "2023-03-15-preview"
 
-2. **Test the Chat App**:
-    Open the URL in your browser and interact with your Chainlit chat app.
+   # Load documents
+   loader = TextLoader('documents.txt')
+   documents = loader.load()
 
-By following these steps, you will have successfully created and deployed an Azure OpenAI, LangChain, ChromaDB, and Chainlit Chat App in Azure Container Apps.
+   # Create index
+   index = VectorstoreIndexCreator().from_loaders([loader])
+
+   # Create conversational retrieval chain
+   retriever = index.vectorstore.as_retriever()
+   qa_chain = ConversationalRetrievalChain.from_llm(
+       llm=OpenAI(temperature=0),
+       retriever=retriever
+   )
+
+   # Initialize conversation history
+   history = []
+
+   @cl.on_message
+   async def main(message):
+       global history
+       result = qa_chain({"question": message, "chat_history": history})
+       history.append((message, result['answer']))
+       await cl.Message(content=result['answer']).send()
+   ```
+
+7. **Set Environment Variables**
+
+   ```bash
+   export OPENAI_API_KEY="<Your Azure OpenAI Key>"
+   export OPENAI_API_BASE="https://$OPENAI_SERVICE_NAME.openai.azure.com/"
+   ```
+
+## Step 3: Test the Application Locally
+
+Run the Chainlit app locally:
+
+```bash
+chainlit run app.py -w
+```
+
+Results:
+
+<!-- expected_similarity=0.3 -->
+
+```log
+[20:15:30] INFO:     Chainlit server is running at http://localhost:8000
+[20:15:30] INFO:     Running app.py
+```
+
+Open your browser and navigate to `http://localhost:8000` to interact with your chat app.
+
+## Step 4: Containerize the Application
+
+1. **Create a `Dockerfile`**
+
+   ```dockerfile
+   FROM python:3.9-slim
+
+   WORKDIR /app
+
+   COPY . /app
+
+   RUN pip install --no-cache-dir -r requirements.txt
+
+   EXPOSE 8000
+
+   CMD ["chainlit", "run", "app.py", "-w", "--host", "0.0.0.0", "--port", "8000"]
+   ```
+
+2. **Build the Docker Image**
+
+   ```bash
+   docker build -t mychainlitapp .
+   ```
+
+3. **Test the Docker Image Locally**
+
+   ```bash
+   docker run -p 8000:8000 mychainlitapp
+   ```
+
+## Step 5: Push the Docker Image to Azure Container Registry
+
+1. **Create Azure Container Registry**
+
+   Set the following environment variable:
+
+   ```bash
+   export ACR_NAME="myContainerRegistry$RANDOM_SUFFIX"
+   ```
+
+   Create the registry:
+
+   ```azurecli-interactive
+   az acr create --resource-group $RESOURCE_GROUP --name $ACR_NAME --sku Basic
+   ```
+
+   Results:
+
+   <!-- expected_similarity=0.3 -->
+
+   ```JSON
+   {
+     "adminUserEnabled": false,
+     "loginServer": "mycontainerregistryxxx.azurecr.io",
+     "name": "myContainerRegistryxxx",
+     "resourceGroup": "myResourceGroupxxx",
+     "location": "eastus",
+     ...
+   }
+   ```
+
+2. **Login to Azure Container Registry**
+
+   ```azurecli-interactive
+   az acr login --name $ACR_NAME
+   ```
+
+3. **Tag and Push the Docker Image**
+
+   ```bash
+   export ACR_LOGIN_SERVER=$(az acr show --name $ACR_NAME --query loginServer -o tsv)
+   docker tag mychainlitapp $ACR_LOGIN_SERVER/mychainlitapp:v1
+   docker push $ACR_LOGIN_SERVER/mychainlitapp:v1
+   ```
+
+## Step 6: Deploy to Azure Container Apps
+
+1. **Register the Container Apps Extension**
+
+   ```azurecli-interactive
+   az extension add --name containerapp --upgrade
+   ```
+
+2. **Create a Container Apps Environment**
+
+   Set the following environment variable:
+
+   ```bash
+   export CONTAINERAPPS_ENVIRONMENT="myContainerAppEnv$RANDOM_SUFFIX"
+   ```
+
+   Create the environment:
+
+   ```azurecli-interactive
+   az containerapp env create --name $CONTAINERAPPS_ENVIRONMENT --resource-group $RESOURCE_GROUP --location $LOCATION
+   ```
+
+3. **Deploy the Container App**
+
+   Set the following environment variable:
+
+   ```bash
+   export CONTAINER_APP_NAME="myChainlitApp$RANDOM_SUFFIX"
+   ```
+
+   Deploy the app:
+
+   ```azurecli-interactive
+   az containerapp create \
+     --name $CONTAINER_APP_NAME \
+     --resource-group $RESOURCE_GROUP \
+     --environment $CONTAINERAPPS_ENVIRONMENT \
+     --image $ACR_LOGIN_SERVER/mychainlitapp:v1 \
+     --target-port 8000 \
+     --ingress external \
+     --registry-server $ACR_LOGIN_SERVER \
+     --cpu 0.5 --memory 1.0Gi
+   ```
+
+## Step 7: Test the Deployment
+
+1. **Get the URL of the Container App**
+
+   ```azurecli-interactive
+   az containerapp show --name $CONTAINER_APP_NAME --resource-group $RESOURCE_GROUP --query properties.configuration.ingress.fqdn -o tsv
+   ```
+
+2. **Test the Chat App**
+
+   Open the URL in your browser to interact with your RAG-enabled chat app.
+
+By following these steps, you have successfully implemented Retrieval-Augmented Generation using Azure Cognitive Services with a chat interface and deployed it to Azure Container Apps.
