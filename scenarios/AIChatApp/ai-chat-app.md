@@ -8,32 +8,30 @@ ms.author: GitHubCopilot
 ms.custom: innovation-engine
 ---
 
-# Tutorial: Implement RAG on Azure Cognitive Services with a Chat Interface
+# Tutorial: Create a RAG Chat App using Azure AI Search with OpenAI in Python
 
-This tutorial will guide you through the steps to implement Retrieval-Augmented Generation (RAG) using Azure Cognitive Services, LangChain, ChromaDB, and Chainlit, and deploy it in Azure Container Apps.
+This tutorial guides you through the process of creating a Retrieval-Augmented Generation (RAG) Chat App using Azure AI Search with OpenAI in Python.
 
 ## Prerequisites
 
 - An Azure account with an active subscription.
 - Azure CLI installed on your local machine.
-- Docker installed on your local machine.
 - Python 3.9 or higher installed on your local machine.
+- Docker installed if you plan to containerize the application.
 
-## Step 1: Create an Azure OpenAI Service
+## Step 1: Create Azure Resources
 
-1. **Create a Resource Group**
-
-   Set the following environment variables:
+1. **Set Environment Variables**
 
    ```bash
    export RANDOM_SUFFIX=$(openssl rand -hex 3)
    export RESOURCE_GROUP="myResourceGroup$RANDOM_SUFFIX"
-   export LOCATION="eastus"
+   export LOCATION="westus2"
    ```
 
-   Create the resource group:
+2. **Create a Resource Group**
 
-   ```azurecli-interactive
+   ```bash
    az group create --name $RESOURCE_GROUP --location $LOCATION
    ```
 
@@ -44,7 +42,7 @@ This tutorial will guide you through the steps to implement Retrieval-Augmented 
    ```JSON
    {
      "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroupxxx",
-     "location": "eastus",
+     "location": "westus2",
      "managedBy": null,
      "name": "myResourceGroupxxx",
      "properties": {
@@ -55,121 +53,197 @@ This tutorial will guide you through the steps to implement Retrieval-Augmented 
    }
    ```
 
-2. **Create an Azure OpenAI Service**
+3. **Create an Azure Cognitive Search Service**
 
-   Set the following environment variable:
+   ```bash
+   export SEARCH_SERVICE_NAME="mySearchService$RANDOM_SUFFIX"
+   az search service create \
+     --name $SEARCH_SERVICE_NAME \
+     --resource-group $RESOURCE_GROUP \
+     --location $LOCATION \
+     --sku basic
+   ```
+
+   Results:
+
+   <!-- expected_similarity=0.3 -->
+
+   ```JSON
+   {
+     "hostName": "mysearchservicexxx.search.windows.net",
+     "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroupxxx/providers/Microsoft.Search/searchServices/mySearchServicexxx",
+     "location": "westus2",
+     "name": "mySearchServicexxx",
+     "properties": {
+       "status": "running",
+       "provisioningState": "succeeded",
+       "replicaCount": 1,
+       "partitionCount": 1,
+       "sku": {
+         "name": "basic"
+       }
+     },
+     "type": "Microsoft.Search/searchServices"
+   }
+   ```
+
+4. **Create an Azure OpenAI Service**
 
    ```bash
    export OPENAI_SERVICE_NAME="myOpenAIService$RANDOM_SUFFIX"
-   ```
-
-   Create the Azure OpenAI Service:
-
-   ```azurecli-interactive
    az cognitiveservices account create \
      --name $OPENAI_SERVICE_NAME \
      --resource-group $RESOURCE_GROUP \
      --kind OpenAI \
      --sku S0 \
      --location $LOCATION \
-     --yes
+     --custom-domain $OPENAI_SERVICE_NAME
    ```
 
-## Step 2: Set Up LangChain, ChromaDB, and Prepare the Data
+## Step 2: Prepare the Data and Index
 
-1. **Create a Working Directory**
+1. **Create a Sample Document**
 
    ```bash
    mkdir rag-chat-app
    cd rag-chat-app
+   echo "Azure Cognitive Search enhances the experience of users by indexing and retrieving relevant data." > documents.txt
    ```
 
-2. **Create a Virtual Environment**
+2. **Upload Documents to Azure Cognitive Search**
+
+   ```bash
+   az search service update \
+     --name $SEARCH_SERVICE_NAME \
+     --resource-group $RESOURCE_GROUP \
+     --set properties.corsOptions.allowedOrigins="*"
+
+   export SEARCH_ADMIN_KEY=$(az search admin-key show --resource-group $RESOURCE_GROUP --service-name $SEARCH_SERVICE_NAME --query primaryKey --output tsv)
+   ```
+
+   Create a Python script `upload_docs.py`:
+
+   ```python
+   import os
+   from azure.core.credentials import AzureKeyCredential
+   from azure.search.documents import SearchClient, SearchIndexClient
+   from azure.search.documents.indexes.models import SearchIndex, SimpleField, edm
+
+   search_service_endpoint = f"https://{os.environ['SEARCH_SERVICE_NAME']}.search.windows.net"
+   admin_key = os.environ['SEARCH_ADMIN_KEY']
+
+   index_name = "documents"
+
+   index_client = SearchIndexClient(search_service_endpoint, AzureKeyCredential(admin_key))
+
+   fields = [
+       SimpleField(name="id", type=edm.String, key=True),
+       SimpleField(name="content", type=edm.String, searchable=True)
+   ]
+
+   index = SearchIndex(name=index_name, fields=fields)
+
+   index_client.create_or_update_index(index)
+
+   search_client = SearchClient(search_service_endpoint, index_name, AzureKeyCredential(admin_key))
+
+   documents = [
+       {"id": "1", "content": open("documents.txt").read()}
+   ]
+
+   result = search_client.upload_documents(documents)
+   print(f"Uploaded documents: {result}")
+   ```
+
+   Run the script:
+
+   ```bash
+   export SEARCH_SERVICE_NAME
+   export SEARCH_ADMIN_KEY
+   python3 upload_docs.py
+   ```
+
+## Step 3: Build the RAG Chat App
+
+1. **Create a Virtual Environment**
 
    ```bash
    python3 -m venv venv
    source venv/bin/activate
    ```
 
-3. **Create a `requirements.txt` File**
+2. **Install Dependencies**
+
+   Create a `requirements.txt` file:
 
    ```plaintext
-   langchain
-   chromadb
-   chainlit
+   azure-search-documents
    openai
-   tiktoken
+   python-dotenv
+   flask
    ```
 
-4. **Install the Dependencies**
+   Install the dependencies:
 
    ```bash
    pip install -r requirements.txt
    ```
 
-5. **Prepare the Data**
-
-   Create a `documents.txt` file with sample content:
-
-   ```bash
-   echo "Azure Cognitive Services provide AI capabilities for developers to build intelligent applications." > documents.txt
-   ```
-
-6. **Create an `app.py` File**
+3. **Create the `app.py` File**
 
    ```python
    import os
-   from langchain.document_loaders import TextLoader
-   from langchain.indexes import VectorstoreIndexCreator
-   from langchain.chains import ConversationalRetrievalChain
-   from langchain.embeddings import OpenAIEmbeddings
-   from langchain.llms import OpenAI
-   import chainlit as cl
+   from flask import Flask, request, jsonify
+   from azure.core.credentials import AzureKeyCredential
+   from azure.search.documents import SearchClient
+   import openai
 
-   # Set Azure OpenAI API credentials
-   os.environ["OPENAI_API_TYPE"] = "azure"
-   os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-   os.environ["OPENAI_API_BASE"] = os.getenv("OPENAI_API_BASE")
-   os.environ["OPENAI_API_VERSION"] = "2023-03-15-preview"
+   app = Flask(__name__)
 
-   # Load documents
-   loader = TextLoader('documents.txt')
-   documents = loader.load()
+   search_service_endpoint = f"https://{os.environ['SEARCH_SERVICE_NAME']}.search.windows.net"
+   index_name = "documents"
+   search_client = SearchClient(search_service_endpoint, index_name, AzureKeyCredential(os.environ['SEARCH_ADMIN_KEY']))
 
-   # Create index
-   index = VectorstoreIndexCreator().from_loaders([loader])
+   openai.api_type = "azure"
+   openai.api_base = f"https://{os.environ['OPENAI_SERVICE_NAME']}.openai.azure.com/"
+   openai.api_version = "2023-03-15-preview"
+   openai.api_key = os.environ["OPENAI_API_KEY"]
 
-   # Create conversational retrieval chain
-   retriever = index.vectorstore.as_retriever()
-   qa_chain = ConversationalRetrievalChain.from_llm(
-       llm=OpenAI(temperature=0),
-       retriever=retriever
-   )
+   @app.route('/chat', methods=['POST'])
+   def chat():
+       user_question = request.json.get('question', '')
 
-   # Initialize conversation history
-   history = []
+       results = search_client.search(user_question)
+       context = " ".join([doc['content'] for doc in results])
 
-   @cl.on_message
-   async def main(message):
-       global history
-       result = qa_chain({"question": message, "chat_history": history})
-       history.append((message, result['answer']))
-       await cl.Message(content=result['answer']).send()
+       response = openai.Completion.create(
+           engine="text-davinci-003",
+           prompt=f"Answer the following question using the context below:\n\nContext: {context}\n\nQuestion: {user_question}\nAnswer:",
+           max_tokens=150
+       )
+
+       answer = response.choices[0].text.strip()
+       return jsonify({'answer': answer})
+
+   if __name__ == '__main__':
+       app.run(host='0.0.0.0', port=5000)
    ```
 
-7. **Set Environment Variables**
+4. **Set Environment Variables**
 
    ```bash
+   export SEARCH_SERVICE_NAME=$SEARCH_SERVICE_NAME
+   export SEARCH_ADMIN_KEY=$SEARCH_ADMIN_KEY
+   export OPENAI_SERVICE_NAME=$OPENAI_SERVICE_NAME
    export OPENAI_API_KEY="<Your Azure OpenAI Key>"
-   export OPENAI_API_BASE="https://$OPENAI_SERVICE_NAME.openai.azure.com/"
    ```
 
-## Step 3: Test the Application Locally
+## Step 4: Test the Application Locally
 
-Run the Chainlit app locally:
+Run the application:
 
 ```bash
-chainlit run app.py -w
+python3 app.py
 ```
 
 Results:
@@ -177,13 +251,29 @@ Results:
 <!-- expected_similarity=0.3 -->
 
 ```log
-[20:15:30] INFO:     Chainlit server is running at http://localhost:8000
-[20:15:30] INFO:     Running app.py
+ * Serving Flask app 'app'
+ * Running on all addresses.
+   WARNING: This is a development server. Do not use it in a production deployment.
+ * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
 ```
 
-Open your browser and navigate to `http://localhost:8000` to interact with your chat app.
+In another terminal, test the chat endpoint:
 
-## Step 4: Containerize the Application
+```bash
+curl -X POST http://localhost:5000/chat -H "Content-Type: application/json" -d '{"question": "What does Azure Cognitive Search do?"}'
+```
+
+Results:
+
+<!-- expected_similarity=0.3 -->
+
+```JSON
+{
+  "answer": "Azure Cognitive Search indexes and retrieves relevant data to enhance user experiences."
+}
+```
+
+## Step 5: (Optional) Containerize the Application
 
 1. **Create a `Dockerfile`**
 
@@ -196,122 +286,23 @@ Open your browser and navigate to `http://localhost:8000` to interact with your 
 
    RUN pip install --no-cache-dir -r requirements.txt
 
-   EXPOSE 8000
+   EXPOSE 5000
 
-   CMD ["chainlit", "run", "app.py", "-w", "--host", "0.0.0.0", "--port", "8000"]
+   CMD ["python", "app.py"]
    ```
 
 2. **Build the Docker Image**
 
    ```bash
-   docker build -t mychainlitapp .
+   docker build -t rag-chat-app .
    ```
 
-3. **Test the Docker Image Locally**
+3. **Run the Docker Container**
 
    ```bash
-   docker run -p 8000:8000 mychainlitapp
+   docker run -p 5000:5000 rag-chat-app
    ```
 
-## Step 5: Push the Docker Image to Azure Container Registry
+## Conclusion
 
-1. **Create Azure Container Registry**
-
-   Set the following environment variable:
-
-   ```bash
-   export ACR_NAME="myContainerRegistry$RANDOM_SUFFIX"
-   ```
-
-   Create the registry:
-
-   ```azurecli-interactive
-   az acr create --resource-group $RESOURCE_GROUP --name $ACR_NAME --sku Basic
-   ```
-
-   Results:
-
-   <!-- expected_similarity=0.3 -->
-
-   ```JSON
-   {
-     "adminUserEnabled": false,
-     "loginServer": "mycontainerregistryxxx.azurecr.io",
-     "name": "myContainerRegistryxxx",
-     "resourceGroup": "myResourceGroupxxx",
-     "location": "eastus",
-     ...
-   }
-   ```
-
-2. **Login to Azure Container Registry**
-
-   ```azurecli-interactive
-   az acr login --name $ACR_NAME
-   ```
-
-3. **Tag and Push the Docker Image**
-
-   ```bash
-   export ACR_LOGIN_SERVER=$(az acr show --name $ACR_NAME --query loginServer -o tsv)
-   docker tag mychainlitapp $ACR_LOGIN_SERVER/mychainlitapp:v1
-   docker push $ACR_LOGIN_SERVER/mychainlitapp:v1
-   ```
-
-## Step 6: Deploy to Azure Container Apps
-
-1. **Register the Container Apps Extension**
-
-   ```azurecli-interactive
-   az extension add --name containerapp --upgrade
-   ```
-
-2. **Create a Container Apps Environment**
-
-   Set the following environment variable:
-
-   ```bash
-   export CONTAINERAPPS_ENVIRONMENT="myContainerAppEnv$RANDOM_SUFFIX"
-   ```
-
-   Create the environment:
-
-   ```azurecli-interactive
-   az containerapp env create --name $CONTAINERAPPS_ENVIRONMENT --resource-group $RESOURCE_GROUP --location $LOCATION
-   ```
-
-3. **Deploy the Container App**
-
-   Set the following environment variable:
-
-   ```bash
-   export CONTAINER_APP_NAME="myChainlitApp$RANDOM_SUFFIX"
-   ```
-
-   Deploy the app:
-
-   ```azurecli-interactive
-   az containerapp create \
-     --name $CONTAINER_APP_NAME \
-     --resource-group $RESOURCE_GROUP \
-     --environment $CONTAINERAPPS_ENVIRONMENT \
-     --image $ACR_LOGIN_SERVER/mychainlitapp:v1 \
-     --target-port 8000 \
-     --ingress external \
-     --registry-server $ACR_LOGIN_SERVER \
-     --cpu 0.5 --memory 1.0Gi
-   ```
-
-## Step 7: Test the Deployment
-
-1. **Get the URL of the Container App**
-
-   ```azurecli-interactive
-   az containerapp show --name $CONTAINER_APP_NAME --resource-group $RESOURCE_GROUP --query properties.configuration.ingress.fqdn -o tsv
-   ```
-
-2. **Test the Chat App**
-
-   Open the URL in your browser to interact with your RAG-enabled chat app.
-
-By following these steps, you have successfully implemented Retrieval-Augmented Generation using Azure Cognitive Services with a chat interface and deployed it to Azure Container Apps.
+You have successfully created a RAG Chat App using Azure AI Search with OpenAI in Python.

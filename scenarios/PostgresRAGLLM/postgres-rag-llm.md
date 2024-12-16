@@ -29,7 +29,7 @@ export REGION="centralus"
 
 az group create \
     --name $RG_NAME \
-    --location $REGION \
+    --location $REGION 
 ```
 
 ## Create OpenAI resources
@@ -46,7 +46,7 @@ az cognitiveservices account create \
     --resource-group $RG_NAME \
     --location westus \
     --kind OpenAI \
-    --sku s0 \
+    --sku s0 
 ```
 
 ## Create OpenAI deployments
@@ -138,12 +138,12 @@ python chat.py --populate --api-key $API_KEY --endpoint $ENDPOINT --pguser $PGUS
 
 ## Run Chat bot
 
-This final step prints out the command you can copy/paste into the terminal to run the chatbot. 
-
-`cd ~/scenarios/PostgresRagLlmDemo && python chat.py --api-key $API_KEY --endpoint $ENDPOINT --pguser $PGUSER --phhost $PGHOST --pgpassword $PGPASSWORD --pgdatabase $PGDATABASE`
+This final step initializes the chatbot in your terminal. You can ask it questions about Zytonium and it will use the embeddings in the postgres database to augment your query with relevant context before sending it to the LLM model.
 
 ```bash
-echo "
-To run the chatbot, see the last step for more info.
-"
+echo "Ask the chatbot a question about Zytonium!"
+```
+
+```bash
+python chat.py --api-key $API_KEY --endpoint $ENDPOINT --pguser $PGUSER --phhost $PGHOST --pgpassword $PGPASSWORD --pgdatabase $PGDATABASE
 ```
