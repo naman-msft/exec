@@ -1,10 +1,14 @@
 import argparse
+import logging
 from textwrap import dedent
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from openai import AzureOpenAI
 
 from db import VectorDatabase
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--api-key', dest='api_key', type=str)
@@ -14,11 +18,13 @@ parser.add_argument('--phhost', dest='phhost', type=str)
 parser.add_argument('--pgpassword', dest='pgpassword', type=str)
 parser.add_argument('--pgdatabase', dest='pgdatabase', type=str)
 parser.add_argument('--populate', dest='populate', action="store_true")
+parser.add_argument('--question', dest='question', type=str, help="Question to ask the chatbot")
 args = parser.parse_args()
 
 
 class ChatBot:
     def __init__(self):
+        logging.debug("Initializing ChatBot")
         self.db = VectorDatabase(pguser=args.pguser, pghost=args.phhost, pgpassword=args.pgpassword, pgdatabase=args.pgdatabase)
         self.api = AzureOpenAI(
             azure_endpoint=args.endpoint,
@@ -33,6 +39,7 @@ class ChatBot:
         )
 
     def load_file(self, text_file: str):
+        logging.debug(f"Loading file: {text_file}")
         with open(text_file, encoding="UTF-8") as f:
             data = f.read()
             chunks = self.text_splitter.create_documents([data])
@@ -42,9 +49,11 @@ class ChatBot:
                 self.db.save_embedding(i, text, embedding)
 
     def __create_embedding(self, text: str):
+        logging.debug(f"Creating embedding for text: {text[:30]}...")
         return self.api.embeddings.create(model="text-embedding-ada-002", input=text).data[0].embedding
 
     def get_answer(self, question: str):
+        logging.debug(f"Getting answer for question: {question}")
         question_embedding = self.__create_embedding(question)
         context = self.db.search_documents(question_embedding)
 
@@ -76,9 +85,14 @@ def main():
     chat_bot = ChatBot()
 
     if args.populate:
-        print("Loading embedding data into database...")
+        logging.debug("Loading embedding data into database...")
         chat_bot.load_file("knowledge.txt")
-        print("Done loading data.")
+        logging.debug("Done loading data.")
+        return
+
+    if args.question:
+        logging.debug(f"Question provided: {args.question}")
+        print(chat_bot.get_answer(args.question))
         return
 
     while True:

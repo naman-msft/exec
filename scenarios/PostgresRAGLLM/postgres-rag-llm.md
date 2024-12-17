@@ -23,7 +23,7 @@ The script will search the database for relevant information for our query using
 Set up a resource group with a random ID.
 
 ```bash
-export RANDOM_ID="$(openssl rand -hex 3)"
+export RANDOM_ID="b795cc"
 export RG_NAME="myPostgresResourceGroup$RANDOM_ID"
 export REGION="centralus"
 
@@ -136,7 +136,94 @@ pip install -r requirements.txt
 python chat.py --populate --api-key $API_KEY --endpoint $ENDPOINT --pguser $PGUSER --phhost $PGHOST --pgpassword $PGPASSWORD --pgdatabase $PGDATABASE
 ```
 
-## Run Chat bot
+## Set up Web Interface
+
+Create a simple web interface for the chatbot using Flask.
+
+1. **Install Flask**
+
+    ```bash
+    pip install Flask
+    ```
+
+2. **Create `app.py`**
+
+    Create a file named `app.py` in the `scenarios/PostgresRagLlmDemo` directory with the following content:
+
+    ```python
+    from flask import Flask, request, render_template
+    import subprocess
+    import os
+
+    app = Flask(__name__)
+
+    @app.route('/', methods=['GET'])
+    def home():
+        return render_template('index.html', response='')
+
+    @app.route('/ask', methods=['POST'])
+    def ask():
+        question = request.form['question']
+        result = subprocess.run([
+            'python', 'chat.py',
+            '--api-key', os.getenv('API_KEY'),
+            '--endpoint', os.getenv('ENDPOINT'),
+            '--pguser', os.getenv('PGUSER'),
+            '--phhost', os.getenv('PGHOST'),
+            '--pgpassword', os.getenv('PGPASSWORD'),
+            '--pgdatabase', os.getenv('PGDATABASE'),
+            '--question', question
+        ], capture_output=True, text=True)
+        response = result.stdout
+        return render_template('index.html', response=response)
+
+    if __name__ == '__main__':
+        app.run(host='0.0.0.0', port=5000)
+    ```
+
+3. **Create `index.html`**
+
+    Create a `templates` directory inside `scenarios/PostgresRagLlmDemo` and add an `index.html` file with the following content:
+
+    ```html
+    <!doctype html>
+    <html lang="en">
+      <head>
+        <title>Chatbot Interface</title>
+      </head>
+      <body>
+        <h1>Ask about Zytonium</h1>
+        <form action="/ask" method="post">
+          <input type="text" name="question" required>
+          <button type="submit">Ask</button>
+        </form>
+        <pre>{{ response }}</pre>
+      </body>
+    </html>
+    ```
+
+4. **Run the Web Server**
+
+    Ensure that all environment variables are exported and then run the Flask application:
+
+    ```bash
+    export API_KEY="$API_KEY"
+    export ENDPOINT="$ENDPOINT"
+    export PGUSER="$PGUSER"
+    export PGHOST="$PGHOST"
+    export PGPASSWORD="$PGPASSWORD"
+    export PGDATABASE="$PGDATABASE"
+
+    python app.py
+    ```
+
+    The web interface will be accessible at `http://localhost:5000`. You can ask questions about Zytonium through the browser.
+
+## Next Steps
+
+- Explore more features of [Azure Cognitive Search](https://learn.microsoft.com/azure/search/search-what-is-azure-search).
+- Learn how to [use Azure OpenAI with your data](https://learn.microsoft.com/azure/cognitive-services/openai/use-your-data).
+<!-- ## Run Chat bot
 
 This final step initializes the chatbot in your terminal. You can ask it questions about Zytonium and it will use the embeddings in the postgres database to augment your query with relevant context before sending it to the LLM model.
 
@@ -146,4 +233,4 @@ echo "Ask the chatbot a question about Zytonium!"
 
 ```bash
 python chat.py --api-key $API_KEY --endpoint $ENDPOINT --pguser $PGUSER --phhost $PGHOST --pgpassword $PGPASSWORD --pgdatabase $PGDATABASE
-```
+``` -->
