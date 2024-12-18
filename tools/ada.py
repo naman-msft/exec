@@ -32,7 +32,7 @@ for package in REQUIRED_PACKAGES:
     except pkg_resources.DistributionNotFound:
         subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
-system_prompt = """Exec Docs is a vehicle transforms standard markdown into interactive, executable learning content, allowing code commands within the document to be run step-by-step or “one-click”. This is powered by the Innovation Engine, an open-source CLI tool that powers the execution and testing of these markdown scripts and can integrate with automated CI/CD pipelines. You are an Exec Doc writing expert. You will either write a new exec doc from scratch if no doc is attached or update an existing one if it is attached. You must adhere to the following rules while presenting your output:
+system_prompt = """Exec Docs is a vehicle that transforms standard markdown into interactive, executable learning content, allowing code commands within the document to be run step-by-step or “one-click”. This is powered by the Innovation Engine, an open-source CLI tool that powers the execution and testing of these markdown scripts and can integrate with automated CI/CD pipelines. You are an Exec Doc writing expert. You will either write a new exec doc from scratch if no doc is attached or update an existing one if it is attached. You must adhere to the following rules while presenting your output:
 
 ### Prerequisites
 
@@ -251,7 +251,7 @@ Check if all prerequisites below are met before writing the Exec Doc. ***If any 
 
 ### DON'T START AND END YOUR ANSWER WITH ``` BACKTICKS!!! 
 
-### YOU MUST ONLY ADD TO THE CONTENT OF THE DOC. DO NOT REDUCE OR REMOVE ANY DESCRIPTIONS OR OUTPUT CODE BLOCKS!!! 
+### ONLY MODIFY THE CONTENT WITHIN CODE BLOCKS IF A CORRECTION OR UPDATE IS NECESSARY, AND DO NOT ALTER OR REMOVE ANY NON-CODE CONTENT OUTSIDE THE CODE BLOCKS. PRESERVE FORMATTING, COMMENTS, SPECIAL CHARACTERS (E.G., ARROWS, BRACKETS, OR QUOTED TEXT), AND ANY DESCRIPTIVE CONTENT EXACTLY AS IT APPEARS. ENSURE THAT ALL CHANGES TO CODE BLOCKS ARE MINIMAL AND EXPLICITLY ADDRESS FUNCTIONALITY OR ERROR CORRECTIONS, WITH COMMENTS OR EXPLANATIONS PROVIDED WITHIN THE CODE ITSELF TO EXPLAIN THE CHANGES.
 
 ## WRITE AN EXEC DOC USING THE ABOVE RULES FOR THE FOLLOWING WORKLOAD: """
 
@@ -297,7 +297,7 @@ def remove_backticks_from_file(file_path):
 def log_data_to_csv(data):
     file_exists = os.path.isfile('execution_log.csv')
     with open('execution_log.csv', 'a', newline='') as csvfile:
-        fieldnames = ['Timestamp', 'Input File Path', 'Output File Path', 'Number of Attempts', 'Errors Encountered', 'Chain of Thoughts', 'Execution Time', 'Success/Failure']
+        fieldnames = ['Timestamp', 'Input File Path', 'Output File Path', 'Number of Attempts', 'Errors Encountered', 'Chain of Thoughts', 'Execution Time (in seconds)', 'Success/Failure']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         if not file_exists:
             writer.writeheader()
@@ -342,7 +342,7 @@ def main():
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": file_content},
                     {"role": "assistant", "content": converted_doc},
-                    {"role": "user", "content": f"The following error occurred during testing:\n{error_log}\nPlan for troubleshooting:\n{chain_of_thoughts}\nPlease correct the converted document accordingly in ALL instances where this error has been or can be found. ONLY GIVE THE UPDATED DOC, NOTHING ELSE"}
+                    {"role": "user", "content": f"The following error occurred during testing:\n{error_log}\nPlease correct the converted document accordingly in ALL instances where this error has been or can be found. ONLY GIVE THE UPDATED DOC, NOTHING ELSE"}
                 ]
             )
             converted_doc = response.choices[0].message.content
@@ -363,17 +363,17 @@ def main():
             errors_encountered.append(error_log.strip())
             print(f"\nError: {error_log.strip()}")
 
-            print(f"\n{'~'*40}\nThinking on how to solve this error...\n{'~'*40}")
+            # print(f"\n{'~'*40}\nThinking on how to solve this error...\n{'~'*40}")
             
-            # Generate chain of thoughts for troubleshooting
-            response = client.chat.completions.create(
-                model=deployment_name,
-                messages=[
-                    {"role": "assistant", "content": converted_doc},
-                    {"role": "user", "content": f"The following error occurred during testing:\n{error_log}\nPlease provide a very specific plan on how to troubleshoot this error and ALL OTHER ERRORS you see throughout the document."}
-                ]
-            )
-            chain_of_thoughts = response.choices[0].message.content
+            # # Generate chain of thoughts for troubleshooting
+            # response = client.chat.completions.create(
+            #     model=deployment_name,
+            #     messages=[
+            #         {"role": "assistant", "content": converted_doc},
+            #         {"role": "user", "content": f"The following error occurred during testing:\n{error_log}\nPlease provide a very specific plan on how to troubleshoot this error and ALL OTHER ERRORS you see throughout the document."}
+            #     ]
+            # )
+            # chain_of_thoughts = response.choices[0].message.content
             attempt += 1
             success = False
 
@@ -389,8 +389,7 @@ def main():
         'Output File Path': output_file,
         'Number of Attempts': attempt-1,
         'Errors Encountered': "\n\n ".join(errors_encountered),
-        'Chain of Thoughts': chain_of_thoughts,
-        'Execution Time': execution_time,
+        'Execution Time (in seconds)': execution_time,
         'Success/Failure': "Success" if success else "Failure"
     }
 
