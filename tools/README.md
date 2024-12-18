@@ -32,11 +32,7 @@ Welcome to Exec Docs Agent! This tool helps you convert documents and troublesho
 
 3. Ensure you have the Azure OpenAI API key and GitHub access token set as environment variables:
     ```bash
-    export AZ
-
-URE
-
-_OPENAI_API_KEY=<your-azure-openai-api-key>
+    export AZURE_OPENAI_API_KEY=<your-azure-openai-api-key>
     export AZURE_OPENAI_ENDPOINT=<your-azure-openai-endpoint>
     export GitHub_Token=<your-github-access-token>
     ```

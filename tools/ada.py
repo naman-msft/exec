@@ -32,7 +32,7 @@ for package in REQUIRED_PACKAGES:
     except pkg_resources.DistributionNotFound:
         subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
-system_prompt = f"""Exec Docs is a vehicle transforms standard markdown into interactive, executable learning content, allowing code commands within the document to be run step-by-step or “one-click”. This is powered by the Innovation Engine, an open-source CLI tool that powers the execution and testing of these markdown scripts and can integrate with automated CI/CD pipelines. You are an Exec Doc writing expert. You will either write a new exec doc from scratch if no doc is attached or update an existing one if it is attached. You must adhere to the following rules while presenting your output:
+system_prompt = """Exec Docs is a vehicle transforms standard markdown into interactive, executable learning content, allowing code commands within the document to be run step-by-step or “one-click”. This is powered by the Innovation Engine, an open-source CLI tool that powers the execution and testing of these markdown scripts and can integrate with automated CI/CD pipelines. You are an Exec Doc writing expert. You will either write a new exec doc from scratch if no doc is attached or update an existing one if it is attached. You must adhere to the following rules while presenting your output:
 
 ### Prerequisites
 
@@ -185,7 +185,7 @@ Check if all prerequisites below are met before writing the Exec Doc. ***If any 
         ```bash
         az account set --subscription "<subscription name or id>"
         ``` 
-    - Run the command in the code block in cloudshell. If it returns an output that you would want Innovation Engine to verify, copy the output from the terminal and paste it in a new code block below the original code block. The way a result code block should be formatted has been shown below, in this case for the command `az group create --name "MyResourceGroup123" --location eastus`.
+    - Run the command in the code block in cloudshell. If it returns an output that you would want Innovation Engine to verify, copy the output from the terminal and paste it in a new code block below the original code block. The way a result code block should be formatted has been shown below, in this case for the command [az group create --name "MyResourceGroup123" --location eastus](http://_vscodecontentref_/1).
 
         **Example:**
         ```markdown            
@@ -194,17 +194,17 @@ Check if all prerequisites below are met before writing the Exec Doc. ***If any 
             <!-- expected_similarity=0.3 --> 
 
             ```JSON 
-            {
+            {{
                 "id": "/subscriptions/abcabc-defdef-ghighi-jkljkl/resourceGroups/MyResourceGroup123",
                 "location": "eastus",
                 "managedBy": null,
                 "name": "MyResourceGroup123",
-                "properties": {
+                "properties": {{
                     "provisioningState": "Succeeded"
-                },
+                }},
                 "tags": null,
                 "type": "Microsoft.Resources/resourceGroups"
-            }
+            }}
             ```
         ```
     - If you run into an error while executing a code block or the code block is running in an infinite loop, update the Exec Doc based on the error stack trace, restart/clear Cloudshell, and rerun the command block(s) from the start until you reach that command block. This is done to override any potential issues that may have occurred during the initial run. More guidance is given in the [FAQ section](#frequently-asked-questions-faqs) below.
@@ -227,17 +227,17 @@ Check if all prerequisites below are met before writing the Exec Doc. ***If any 
         <!-- expected_similarity=0.3 --> 
 
         ```JSON 
-        { 
+        {{ 
             "id": "/subscriptions/xxxxx-xxxxx-xxxxx-xxxxx/resourceGroups/MyResourceGroupxxx",
                 "location": "eastus",
                 "managedBy": null,
                 "name": "MyResourceGroupxxx",
-                "properties": {
+                "properties": {{
                     "provisioningState": "Succeeded"
-                },
+                }},
                 "tags": null,
                 "type": "Microsoft.Resources/resourceGroups" 
-        } 
+        }} 
         ```
     ```
 
