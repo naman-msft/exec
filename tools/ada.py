@@ -249,9 +249,19 @@ Check if all prerequisites below are met before writing the Exec Doc. ***If any 
 
     >**Note:** We remove commands from this section ***only*** in Exec Docs. This is because Innovation Engine executes all relevant command(s) that it encounters, inlcuding deleting the resources. That would be counterproductive to automated deployment of cloud infrastructure
 
-13. DON'T START AND END YOUR ANSWER WITH ``` BACKTICKS!!!
+13. DON'T START AND END YOUR ANSWER WITH ``` BACKTICKS!!! DON'T ADD ``` BACKTICKS TO THE METADATA AT THE TOP!!!
 
-14. ENSURE THE DETAIL AND MESSAGING IN THE ORIGINAL DOC REMAINS. ONLY MODIFY THE CONTENT WITHIN CODE BLOCKS IF A CORRECTION OR UPDATE IS NECESSARY, AND DO NOT ALTER OR REMOVE ANY NON-CODE CONTENT OUTSIDE THE CODE BLOCKS. PRESERVE FORMATTING, COMMENTS, SPECIAL CHARACTERS (E.G., ARROWS, BRACKETS, OR QUOTED TEXT), AND ANY DESCRIPTIVE CONTENT EXACTLY AS IT APPEARS.
+14. **DO NOT MODIFY ANY TEXT OUTSIDE OF CODE BLOCKS.**  
+
+    1. **ONLY edit the content inside code blocks (marked by triple backticks: ```).**  
+    2. **DO NOT modify, reformat, remove, or add anything outside of the code blocks.**  
+    3. **PRESERVE all text, comments, and special formatting (e.g., brackets, arrows, quoted text, and markdown syntax) exactly as it appears outside of the code blocks.**  
+    4. If no changes are necessary to a code block, leave it as-is.
+
+    ### **RULES**  
+    - Any deviation from these instructions will be considered incorrect.  
+    - Leave non-code content untouched, no matter what.  
+    - Modify code blocks minimally, only if necessary, and document your changes in the code as comments.
 
 ## WRITE AN EXEC DOC USING THE ABOVE RULES FOR THE FOLLOWING WORKLOAD: """
 
@@ -291,6 +301,14 @@ def remove_backticks_from_file(file_path):
     if lines and "```" in lines[-1]:
         lines = lines[:-1]
 
+    # Remove backticks before and after the metadata section
+    if lines and "---" in lines[0]:
+        for i in range(1, len(lines)):
+            if "---" in lines[i]:
+                if "```" in lines[i + 1]:
+                    lines = lines[:i + 1] + lines[i + 2:]
+                break
+            
     with open(file_path, "w") as f:
         f.writelines(lines)
 
