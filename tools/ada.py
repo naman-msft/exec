@@ -32,6 +32,25 @@ for package in REQUIRED_PACKAGES:
     except pkg_resources.DistributionNotFound:
         subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
+# # Read the content of test.md
+# with open('test.md', 'r') as f:
+#     input_file_content = f.read()
+
+# # Read the content of converted_test.md
+# with open('converted_test.md', 'r') as f:
+#     output_file_content = f.read()
+# response = client.chat.completions.create(
+#     model=deployment_name,
+#     messages=[
+#         # {"role": "user", "content": f"""You are given two versions of a markdown document.\n\n- Keep all content within ALL code and output blocks **from the updated document**.\n- Keep all content outside code and output blocks **from the original document**.\n- Merge them into a single document.\n\nOriginal Document:\n\n {input_file_content}\n\nUpdated Document:\n\n {output_file_content}\n\nMerged Document:"""}
+#         {"role": "user", "content": f"""You are given two versions of a markdown document.\n\n- Add ALL missing details from the **Original Document** into the **Updated Document** that were not presented in the **Updated Document**, except code blocks and results blocks.\n\nOriginal Document:\n\n {input_file_content}\n\nUpdated Document:\n\n {output_file_content}\n\nMerged Document:"""}
+#     ]
+# )
+# output_file_content = response.choices[0].message.content
+# with open('final.md', "w") as f:
+#     f.write(output_file_content)
+
+# exit()
 system_prompt = """Exec Docs is a vehicle that transforms standard markdown into interactive, executable learning content, allowing code commands within the document to be run step-by-step or “one-click”. This is powered by the Innovation Engine, an open-source CLI tool that powers the execution and testing of these markdown scripts and can integrate with automated CI/CD pipelines. You are an Exec Doc writing expert. You will either write a new exec doc from scratch if no doc is attached or update an existing one if it is attached. You must adhere to the following rules while presenting your output:
 
 ### Prerequisites
@@ -118,7 +137,11 @@ Check if all prerequisites below are met before writing the Exec Doc. ***If any 
     ---
     ```
 
-7. Ensure the environment variable names are not placeholders i.e. <> but have a certain generic, useful name. For the location/region parameter, default to "WestUS2" or "centralindia". Additionally, appropriately add descriptions below every section explaining what is happening in that section in crisp but necessary detail so that the user can learn as they go
+7. Ensure the environment variable names are not placeholders i.e. <> but have a certain generic, useful name. For the location/region parameter, default to "WestUS2" or "centralindia". Additionally, appropriately add descriptions below every section explaining what is happening in that section in crisp but necessary detail so that the user can learn as they go.
+
+8. Don't start and end your answer with ``` backticks!!! Don't add backticks to the metadata at the top!!!. 
+
+8. Ensure that any info, literally any info whether it is a comment, tag, description, etc., which is not within a code block remains unchanged. Preserve ALL details of the doc.
 
 8. Environment variables are dynamic values that store configuration settings, system paths, and other information that can be accessed throughout a doc. By using environment variables, you can separate configuration details from the code, making it easier to manage and deploy applications in an environment like Exec Docs. 
 
@@ -249,21 +272,7 @@ Check if all prerequisites below are met before writing the Exec Doc. ***If any 
 
     >**Note:** We remove commands from this section ***only*** in Exec Docs. This is because Innovation Engine executes all relevant command(s) that it encounters, inlcuding deleting the resources. That would be counterproductive to automated deployment of cloud infrastructure
 
-13. DON'T START AND END YOUR ANSWER WITH ``` BACKTICKS!!! DON'T ADD ``` BACKTICKS TO THE METADATA AT THE TOP!!!
-
-14. **DO NOT MODIFY ANY TEXT OUTSIDE OF CODE BLOCKS.**  
-
-    1. **ONLY edit the content inside code blocks (marked by triple backticks: ```).**  
-    2. **DO NOT modify, reformat, remove, or add anything outside of the code blocks.**  
-    3. **PRESERVE all text, comments, and special formatting (e.g., brackets, arrows, quoted text, and markdown syntax) exactly as it appears outside of the code blocks.**  
-    4. If no changes are necessary to a code block, leave it as-is.
-
-    ### **RULES**  
-    - Any deviation from these instructions will be considered incorrect.  
-    - Leave non-code content untouched, no matter what.  
-    - Modify code blocks minimally, only if necessary, and document your changes in the code as comments.
-
-## WRITE AN EXEC DOC USING THE ABOVE RULES FOR THE FOLLOWING WORKLOAD: """
+## WRITE AND ONLY GIVE THE EXEC DOC USING THE ABOVE RULES FOR THE FOLLOWING WORKLOAD: """
 
 def install_innovation_engine():
     if shutil.which("ie") is not None:
@@ -308,14 +317,14 @@ def remove_backticks_from_file(file_path):
                 if "```" in lines[i + 1]:
                     lines = lines[:i + 1] + lines[i + 2:]
                 break
-            
+
     with open(file_path, "w") as f:
         f.writelines(lines)
 
 def log_data_to_csv(data):
     file_exists = os.path.isfile('execution_log.csv')
     with open('execution_log.csv', 'a', newline='') as csvfile:
-        fieldnames = ['Timestamp', 'Input File Path', 'Output File Path', 'Number of Attempts', 'Errors Encountered', 'Chain of Thoughts', 'Execution Time (in seconds)', 'Success/Failure']
+        fieldnames = ['Timestamp', 'Input File Path', 'Output File Path', 'Number of Attempts', 'Errors Encountered', 'Execution Time (in seconds)', 'Success/Failure']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         if not file_exists:
             writer.writeheader()
@@ -328,7 +337,7 @@ def main():
     input_file = input("Please enter the path to the file for conversion: ")
 
     with open(input_file, "r") as f:
-        file_content = f.read()
+        input_file_content = f.read()
 
     install_innovation_engine()
 
@@ -337,7 +346,6 @@ def main():
     output_file = f"converted_{os.path.splitext(os.path.basename(input_file))[0]}.md"
     start_time = time.time()
     errors_encountered = []
-    chain_of_thoughts = ""
 
     while attempt <= max_attempts:
         if attempt == 1:
@@ -346,26 +354,26 @@ def main():
                 model=deployment_name,
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": file_content}
+                    {"role": "user", "content": input_file_content}
                 ]
             )
-            converted_doc = response.choices[0].message.content
+            output_file_content = response.choices[0].message.content
             with open(output_file, "w") as f:
-                f.write(converted_doc)
+                f.write(output_file_content)
         else:
             print(f"\n{'='*40}\nAttempt {attempt}: Generating corrections based on error...\n{'='*40}")
             response = client.chat.completions.create(
                 model=deployment_name,
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": file_content},
-                    {"role": "assistant", "content": converted_doc},
-                    {"role": "user", "content": f"The following error occurred during testing:\n{error_log}\nPlease correct the converted document accordingly in ALL instances where this error has been or can be found. ONLY GIVE THE UPDATED DOC, NOTHING ELSE"}
+                    {"role": "user", "content": input_file_content},
+                    {"role": "assistant", "content": output_file_content},
+                    {"role": "user", "content": f"The following error occurred during testing:\n{error_log}\nPlease correct the converted document accordingly in ALL instances where this error has been or can be found. Then, correct ALL other errors that you see in the doc. ONLY GIVE THE UPDATED DOC, NOTHING ELSE"}
                 ]
             )
-            converted_doc = response.choices[0].message.content
+            output_file_content = response.choices[0].message.content
             with open(output_file, "w") as f:
-                f.write(converted_doc)
+                f.write(output_file_content)
 
         remove_backticks_from_file(output_file)
 
@@ -374,24 +382,24 @@ def main():
         if result.returncode == 0:
             print(f"\n{'*'*40}\nAll tests passed successfully.\n{'*'*40}")
             success = True
+            print(f"\n{'='*40}\nProducing Exec Doc...\n{'='*40}")
+            response = client.chat.completions.create(
+                model=deployment_name,
+                messages=[
+                    # {"role": "user", "content": f"""You are given two versions of a markdown document.\n\n- Keep all content within ALL code and output blocks **from the updated document**.\n- Keep all content outside code and output blocks **from the original document**.\n- Merge them into a single document.\n\nOriginal Document:\n\n {input_file_content}\n\nUpdated Document:\n\n {output_file_content}\n\nMerged Document:"""}
+                    {"role": "user", "content": f"""You are given two versions of a markdown document.\n\n- Add ALL missing details from the **Original Document** into the **Updated Document** that were not presented in the **Updated Document**. HOWEVER, DO NOT TOUCH ANY CODE BLOCKS OR OUTPUT BLOCKS OR ANYTHING ELSE IN THE **Updated Document** ```\n\nOriginal Document:\n\n {input_file_content}\n\nUpdated Document:\n\n {output_file_content}\n\nMerged Document:"""}
+                ]
+            )
+            output_file_content = response.choices[0].message.content
+            with open(output_file, "w") as f:
+                f.write(output_file_content)
+            remove_backticks_from_file(output_file)
             break
         else:
             print(f"\n{'!'*40}\nTests failed. Analyzing errors...\n{'!'*40}")
             error_log = get_last_error_log()
             errors_encountered.append(error_log.strip())
             print(f"\nError: {error_log.strip()}")
-
-            # print(f"\n{'~'*40}\nThinking on how to solve this error...\n{'~'*40}")
-            
-            # # Generate chain of thoughts for troubleshooting
-            # response = client.chat.completions.create(
-            #     model=deployment_name,
-            #     messages=[
-            #         {"role": "assistant", "content": converted_doc},
-            #         {"role": "user", "content": f"The following error occurred during testing:\n{error_log}\nPlease provide a very specific plan on how to troubleshoot this error and ALL OTHER ERRORS you see throughout the document."}
-            #     ]
-            # )
-            # chain_of_thoughts = response.choices[0].message.content
             attempt += 1
             success = False
 

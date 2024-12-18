@@ -214,3 +214,64 @@ Once all commands are verified, automate the script:
      ```
 
 By following this comprehensive plan, you'll ensure successful execution of the tutorial while proactively addressing and documenting errors.",130.53598713874817,Failure
+2024-12-18 15:46:02,test.md,converted_test.md,6,"time=2024-12-18T15:21:30-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 1.
+Error: command exited with 'exit status 1' and the message 'ERROR: Invalid image ""UbuntuLTS"". Use a valid image URN, custom image name, custom image id, VHD blob URI, or pick an image from ['CentOS85Gen2', 'Debian11', 'OpenSuseLeap154Gen2', 'RHELRaw8LVMGen2', 'SuseSles15SP5', 'Ubuntu2204', 'Ubuntu2404', 'Ubuntu2404Pro', 'FlatcarLinuxFreeGen2', 'Win2022Datacenter', 'Win2022AzureEditionCore', 'Win2019Datacenter', 'Win2016Datacenter', 'Win2012R2Datacenter', 'Win2012Datacenter'].
+See vm create -h for more information on specifying an image.
+'
+StdErr: ERROR: Invalid image ""UbuntuLTS"". Use a valid image URN, custom image name, custom image id, VHD blob URI, or pick an image from ['CentOS85Gen2', 'Debian11', 'OpenSuseLeap154Gen2', 'RHELRaw8LVMGen2', 'SuseSles15SP5', 'Ubuntu2204', 'Ubuntu2404', 'Ubuntu2404Pro', 'FlatcarLinuxFreeGen2', 'Win2022Datacenter', 'Win2022AzureEditionCore', 'Win2019Datacenter', 'Win2016Datacenter', 'Win2012R2Datacenter', 'Win2012Datacenter'].
+See vm create -h for more information on specifying an image.
+
+ time=2024-12-18T15:22:40-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 1.
+Error: command exited with 'exit status 1' and the message 'ERROR: {""error"":{""code"":""InvalidTemplateDeployment"",""message"":""The template deployment 'vmss_deploy_hTP8EzAFxrpQ1IFQNBw8OLEQqUsyjN3l' is not valid according to the validation procedure. The tracking id is '71055176-984f-43ba-96ad-c12b52ca087d'. See inner errors for details."",""details"":[{""code"":""SkuNotAvailable"",""message"":""The requested VM size for resource 'Following SKUs have failed for Capacity Restrictions: Standard_DS1_v2' is currently not available in location 'eastus'. Please try another size or deploy to a different location or different zone. See https://aka.ms/azureskunotavailable for details.""}]}}
+'
+StdErr: ERROR: {""error"":{""code"":""InvalidTemplateDeployment"",""message"":""The template deployment 'vmss_deploy_hTP8EzAFxrpQ1IFQNBw8OLEQqUsyjN3l' is not valid according to the validation procedure. The tracking id is '71055176-984f-43ba-96ad-c12b52ca087d'. See inner errors for details."",""details"":[{""code"":""SkuNotAvailable"",""message"":""The requested VM size for resource 'Following SKUs have failed for Capacity Restrictions: Standard_DS1_v2' is currently not available in location 'eastus'. Please try another size or deploy to a different location or different zone. See https://aka.ms/azureskunotavailable for details.""}]}}
+
+ time=2024-12-18T15:27:08-08:00 level=error msg=Error testing scenario: failed to execute code block 1 on step 4.
+Error: command exited with 'exit status 3' and the message 'ERROR: (ResourceNotFound) The Resource 'Microsoft.Compute/virtualMachines/myScaleSetxxxxxx_inst1' under resource group 'myResourceGroup75f630' was not found. For more details please go to https://aka.ms/ARMResourceNotFoundFix
+Code: ResourceNotFound
+Message: The Resource 'Microsoft.Compute/virtualMachines/myScaleSetxxxxxx_inst1' under resource group 'myResourceGroup75f630' was not found. For more details please go to https://aka.ms/ARMResourceNotFoundFix
+'
+StdErr: ERROR: (ResourceNotFound) The Resource 'Microsoft.Compute/virtualMachines/myScaleSetxxxxxx_inst1' under resource group 'myResourceGroup75f630' was not found. For more details please go to https://aka.ms/ARMResourceNotFoundFix
+Code: ResourceNotFound
+Message: The Resource 'Microsoft.Compute/virtualMachines/myScaleSetxxxxxx_inst1' under resource group 'myResourceGroup75f630' was not found. For more details please go to https://aka.ms/ARMResourceNotFoundFix
+
+ time=2024-12-18T15:30:55-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 5.
+Error: command exited with 'exit status 2' and the message 'ERROR: 'stop-instance' is misspelled or not recognized by the system.
+Did you mean 'list-instances' ?
+
+Examples from AI knowledge base:
+https://aka.ms/cli_ref
+Read more about the command in reference docs
+'
+StdErr: ERROR: 'stop-instance' is misspelled or not recognized by the system.
+Did you mean 'list-instances' ?
+
+Examples from AI knowledge base:
+https://aka.ms/cli_ref
+Read more about the command in reference docs
+
+ time=2024-12-18T15:34:36-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 5.
+Error: command exited with 'exit status 2' and the message 'ERROR: unrecognized arguments: --force-stop
+
+Examples from AI knowledge base:
+az vmss update-instances --instance-ids 1 --name MyScaleSet --resource-group MyResourceGroup
+Upgrade VMs within a VMSS. (autogenerated)
+
+https://docs.microsoft.com/en-US/cli/azure/vmss#az_vmss_update_instances
+Read more about the command in reference docs
+'
+StdErr: ERROR: unrecognized arguments: --force-stop
+
+Examples from AI knowledge base:
+az vmss update-instances --instance-ids 1 --name MyScaleSet --resource-group MyResourceGroup
+Upgrade VMs within a VMSS. (autogenerated)
+
+https://docs.microsoft.com/en-US/cli/azure/vmss#az_vmss_update_instances
+Read more about the command in reference docs
+
+ time=2024-12-18T15:38:19-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 5.
+Error: command exited with 'exit status 2' and the message 'ERROR: argument --query: invalid jmespath_type value: '[?instanceId==1].id'
+To learn more about --query, please visit: 'https://docs.microsoft.com/cli/azure/query-azure-cli'
+'
+StdErr: ERROR: argument --query: invalid jmespath_type value: '[?instanceId==1].id'
+To learn more about --query, please visit: 'https://docs.microsoft.com/cli/azure/query-azure-cli'",1488.8855123519897,Success
