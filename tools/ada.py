@@ -314,7 +314,7 @@ def main():
 
     install_innovation_engine()
 
-    max_attempts = 5
+    max_attempts = 11
     attempt = 1
     output_file = f"converted_{os.path.splitext(os.path.basename(input_file))[0]}.md"
     start_time = time.time()
