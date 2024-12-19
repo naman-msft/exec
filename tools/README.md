@@ -198,9 +198,9 @@ Welcome to ADA! This tool helps you convert documents and troubleshoot errors ef
 The script logs the following data to `execution_log.csv`:
 
 - Timestamp: The date and time when the script was run.
-- Input Type: Whether the input was a file or a workload description.
+- Type: Whether the input was a file or a workload description.
 - Input: The path to the input file or the workload description.
-- Output File Path: The path to the output file.
+- Output: The path to the output file.
 - Number of Attempts: The number of attempts made to generate a successful document.
 - Errors Encountered: A summary of errors encountered during the process.
 - Execution Time (in seconds): The total time taken to run the script.
