@@ -1,5 +1,5 @@
-Timestamp,Input File Path,Output File Path,Number of Attempts,Errors Encountered,Execution Time (in seconds),Success/Failure
-2024-12-18 16:38:44,test.md,converted_test.md,5,"time=2024-12-18T16:23:54-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 1.
+Timestamp,Type,Input,Output,Number of Attempts,Errors Encountered,Execution Time (in seconds),Success/Failure
+2024-12-18 16:38:44,file,test.md,converted_test.md,5,"time=2024-12-18T16:23:54-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 1.
 Error: command exited with 'exit status 1' and the message 'ERROR: Invalid image ""UbuntuLTS"". Use a valid image URN, custom image name, custom image id, VHD blob URI, or pick an image from ['CentOS85Gen2', 'Debian11', 'OpenSuseLeap154Gen2', 'RHELRaw8LVMGen2', 'SuseSles15SP5', 'Ubuntu2204', 'Ubuntu2404', 'Ubuntu2404Pro', 'FlatcarLinuxFreeGen2', 'Win2022Datacenter', 'Win2022AzureEditionCore', 'Win2019Datacenter', 'Win2016Datacenter', 'Win2012R2Datacenter', 'Win2012Datacenter'].
 See vm create -h for more information on specifying an image.
 '
