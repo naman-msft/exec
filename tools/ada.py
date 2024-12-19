@@ -314,10 +314,10 @@ def log_data_to_csv(data):
         writer.writerow(data)
 
 def main():
-    print("\nWelcome to Exec Docs Agent!\n")
-    print("This tool helps you write and troubleshoot Exec Docs efficiently!\n")
+    print("\nWelcome to ADA - AI Documentation Assistant!\n")
+    print("This tool helps you write and troubleshoot Executable Documents efficiently!\n")
     
-    input_file = input("Please enter the path to the file for conversion: ")
+    input_file = input("Please enter the path to your file for conversion: ")
 
     with open(input_file, "r") as f:
         input_file_content = f.read()
