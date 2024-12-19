@@ -85,7 +85,7 @@ Welcome to ADA! This tool helps you convert documents and troubleshoot errors ef
         ```
         This should display your token.
 
-3. Ensure you have the Azure OpenAI API key and endpoint set as environment variables:
+4. Ensure you have the Azure OpenAI API key and endpoint set as environment variables:
     ```bash
     export AZURE_OPENAI_API_KEY=<your-azure-openai-api-key>
     export AZURE_OPENAI_ENDPOINT=<your-azure-openai-endpoint>
