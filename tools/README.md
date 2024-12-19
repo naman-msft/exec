@@ -30,6 +30,7 @@ Welcome to ADA! This tool helps you convert documents and troubleshoot errors ef
     ```bash
     pip install openai azure-identity requests pygithub
     ```
+
 3. Ensure you have the GitHub access token set as an environment variable:
     ```bash
     export GitHub_Token=<your-github-access-token>
@@ -155,23 +156,25 @@ Welcome to ADA! This tool helps you convert documents and troubleshoot errors ef
     python ada.py
     ```
 
-2. Enter the path to the input file when prompted.
+2. Enter the path to the input file or describe your intended workload when prompted.
 
-3. The script will process the file, convert it using OpenAI's GPT-4O model, and perform testing using the Innovation Engine.
+3. The script will process the file or description, convert it using OpenAI's GPT-4O model, and perform testing using the Innovation Engine.
 
-4. If the tests pass successfully, the script will merge code blocks from the updated document with non-code content from the original document.
+4. If the tests fail, the script will generate troubleshooting steps and attempt to correct the document.
 
-5. The final merged document will be saved, and a summary will be displayed.
+5. If the tests pass successfully, the script will merge code blocks from the updated document with non-code content from the original document.
+
+6. The final merged document will be saved, and a summary will be displayed.
 
 ## Script Workflow
 
 1. **Initialization**: The script initializes the Azure OpenAI client and checks for required packages.
 
-2. **Input File**: Prompts the user to enter the path to the input file.
+2. **Input File or Workload Description**: Prompts the user to enter the path to the input file or describe their intended workload.
 
 3. **System Prompt**: Prepares the system prompt for the AI model.
 
-4. **File Content**: Reads the content of the input file.
+4. **File Content or Workload Description**: Reads the content of the input file or uses the provided workload description.
 
 5. **Install Innovation Engine**: Checks if the Innovation Engine is installed and installs it if necessary.
 
@@ -195,7 +198,8 @@ Welcome to ADA! This tool helps you convert documents and troubleshoot errors ef
 The script logs the following data to `execution_log.csv`:
 
 - Timestamp: The date and time when the script was run.
-- Input File Path: The path to the input file.
+- Input Type: Whether the input was a file or a workload description.
+- Input: The path to the input file or the workload description.
 - Output File Path: The path to the output file.
 - Number of Attempts: The number of attempts made to generate a successful document.
 - Errors Encountered: A summary of errors encountered during the process.

@@ -53,3 +53,21 @@ Power off a running VM without shutting down.
 
 https://docs.microsoft.com/en-US/cli/azure/vm#az_vm_stop
 Read more about the command in reference docs",909.2479140758514,Success
+2024-12-19 13:09:10,workload_description,i want to create a linux vm and ssh into it,generated_exec_doc.md,3,"time=2024-12-19T13:07:08-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 2.
+Error: command exited with 'exit status 1' and the message 'ERROR: Invalid image ""UbuntuLTS"". Use a valid image URN, custom image name, custom image id, VHD blob URI, or pick an image from ['CentOS85Gen2', 'Debian11', 'OpenSuseLeap154Gen2', 'RHELRaw8LVMGen2', 'SuseSles15SP5', 'Ubuntu2204', 'Ubuntu2404', 'Ubuntu2404Pro', 'FlatcarLinuxFreeGen2', 'Win2022Datacenter', 'Win2022AzureEditionCore', 'Win2019Datacenter', 'Win2016Datacenter', 'Win2012R2Datacenter', 'Win2012Datacenter'].
+See vm create -h for more information on specifying an image.
+'
+StdErr: ERROR: Invalid image ""UbuntuLTS"". Use a valid image URN, custom image name, custom image id, VHD blob URI, or pick an image from ['CentOS85Gen2', 'Debian11', 'OpenSuseLeap154Gen2', 'RHELRaw8LVMGen2', 'SuseSles15SP5', 'Ubuntu2204', 'Ubuntu2404', 'Ubuntu2404Pro', 'FlatcarLinuxFreeGen2', 'Win2022Datacenter', 'Win2022AzureEditionCore', 'Win2019Datacenter', 'Win2016Datacenter', 'Win2012R2Datacenter', 'Win2012Datacenter'].
+See vm create -h for more information on specifying an image.
+
+ time=2024-12-19T13:07:20-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 2.
+Error: command exited with 'exit status 1' and the message 'ERROR: An RSA key file or key value must be supplied to SSH Key Value. You can use --generate-ssh-keys to let CLI generate one for you
+'
+StdErr: ERROR: An RSA key file or key value must be supplied to SSH Key Value. You can use --generate-ssh-keys to let CLI generate one for you
+
+ time=2024-12-19T13:08:19-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 3.
+Error: command exited with 'exit status 255' and the message 'Pseudo-terminal will not be allocated because stdin is not a terminal.
+Host key verification failed.
+'
+StdErr: Pseudo-terminal will not be allocated because stdin is not a terminal.
+Host key verification failed.",135.19094800949097,Success

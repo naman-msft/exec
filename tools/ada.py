@@ -10,6 +10,7 @@ import time
 from datetime import datetime
 from openai import AzureOpenAI
 from github import Github
+from collections import defaultdict
 
 client = AzureOpenAI(
     api_key=os.getenv("AZURE_OPENAI_API_KEY"),
@@ -96,7 +97,11 @@ Check if all prerequisites below are met before writing the Exec Doc. ***If any 
 
 ### Writing Requirements
 
-6. Appropriately add metadata at the start of the Exec Doc. Here are some mandatory fields:
+6. Ensure that the Exec Doc does not include any commands or descriptions related to logging into Azure (e.g., `az login`) or setting the subscription ID. The user is expected to have already logged in to Azure and set their subscription beforehand. Do not include these commands or any descriptions about them in the Exec Doc.
+
+7. Ensure that the Exec Doc does not require any user interaction during its execution. The document should not include any commands or scripts that prompt the user for input or expect interaction with the terminal. All inputs must be predefined and handled automatically within the script.
+
+7. Appropriately add metadata at the start of the Exec Doc. Here are some mandatory fields:
 
     - title = the title of the Exec Doc
     - description = the description of the Exec Doc
@@ -307,7 +312,7 @@ def remove_backticks_from_file(file_path):
 def log_data_to_csv(data):
     file_exists = os.path.isfile('execution_log.csv')
     with open('execution_log.csv', 'a', newline='') as csvfile:
-        fieldnames = ['Timestamp', 'Input File Path', 'Output File Path', 'Number of Attempts', 'Errors Encountered', 'Execution Time (in seconds)', 'Success/Failure']
+        fieldnames = ['Timestamp', 'Type', 'Input', 'Output', 'Number of Attempts', 'Errors Encountered', 'Execution Time (in seconds)', 'Success/Failure']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         if not file_exists:
             writer.writeheader()
@@ -317,16 +322,25 @@ def main():
     print("\nWelcome to ADA - AI Documentation Assistant!\n")
     print("This tool helps you write and troubleshoot Executable Documents efficiently!\n")
     
-    input_file = input("Please enter the path to your file for conversion: ")
+    user_input = input("Please enter the path to your markdown file for conversion or describe your intended workload: ")
 
-    with open(input_file, "r") as f:
-        input_file_content = f.read()
+    if os.path.isfile(user_input) and user_input.endswith('.md'):
+        input_type = 'file'
+        with open(user_input, "r") as f:
+            input_content = f.read()
+    else:
+        input_type = 'workload_description'
+        input_content = user_input
 
     install_innovation_engine()
 
     max_attempts = 11
     attempt = 1
-    output_file = f"converted_{os.path.splitext(os.path.basename(input_file))[0]}.md"
+    if input_type == 'file':
+        output_file = f"converted_{os.path.splitext(os.path.basename(user_input))[0]}.md"
+    else:
+        output_file = "generated_exec_doc.md"
+
     start_time = time.time()
     errors_encountered = []
 
@@ -337,7 +351,7 @@ def main():
                 model=deployment_name,
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": input_file_content}
+                    {"role": "user", "content": input_content}
                 ]
             )
             output_file_content = response.choices[0].message.content
@@ -349,9 +363,9 @@ def main():
                 model=deployment_name,
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": input_file_content},
+                    {"role": "user", "content": input_content},
                     {"role": "assistant", "content": output_file_content},
-                    {"role": "user", "content": f"The following error occurred during testing:\n{error_log}\nPlease correct the converted document accordingly in ALL instances where this error has been or can be found. Then, correct ALL other errors that you see in the doc. ONLY GIVE THE UPDATED DOC, NOTHING ELSE"}
+                    {"role": "user", "content": f"The following error(s) have occurred during testing:\n{errors_text}\nPlease carefully analyze these errors and make necessary corrections to the document to prevent them from happening again. Try to find different solutions if the same errors keep occurring. \nGiven that context, please think hard and don't hurry. I want you to correct the converted document in ALL instances where this error has been or can be found. Then, correct ALL other errors apart from this that you see in the doc. ONLY GIVE THE UPDATED DOC, NOTHING ELSE"}
                 ]
             )
             output_file_content = response.choices[0].message.content
@@ -361,19 +375,26 @@ def main():
         remove_backticks_from_file(output_file)
 
         print(f"\n{'-'*40}\nRunning Innovation Engine tests...\n{'-'*40}")
-        result = subprocess.run(["ie", "test", output_file], capture_output=True, text=True)
+        try:
+            result = subprocess.run(["ie", "test", output_file], capture_output=True, text=True, timeout=660)
+        except subprocess.TimeoutExpired:
+            print("The 'ie test' command timed out after 11 minutes.")
+            errors_encountered.append("The 'ie test' command timed out after 11 minutes.")
+            attempt += 1
+            continue  # Proceed to the next attempt
         if result.returncode == 0:
             print(f"\n{'*'*40}\nAll tests passed successfully.\n{'*'*40}")
             success = True
             print(f"\n{'='*40}\nProducing Exec Doc...\n{'='*40}")
-            response = client.chat.completions.create(
-                model=deployment_name,
-                messages=[
-                    {"role": "user", "content": f"""You are given two versions of a markdown document.\n\n- Add ALL missing details from the **Original Document** into the **Updated Document** that were not presented in the **Updated Document**. HOWEVER, DO NOT TOUCH ANY CODE BLOCKS OR OUTPUT BLOCKS OR ANYTHING ELSE IN THE **Updated Document** ```\n\nOriginal Document:\n\n {input_file_content}\n\nUpdated Document:\n\n {output_file_content}\n\nMerged Document:"""}
-                ]
-            )
+            if input_type == 'file':
+                response = client.chat.completions.create(
+                    model=deployment_name,
+                    messages=[
+                        f"The following errors have occurred during testing:\n{errors_text}\n{additional_instruction}\nPlease carefully analyze these errors and make necessary corrections to the document to prevent them from happening again. ONLY GIVE THE UPDATED DOC, NOTHING ELSE"
+                    ]
+                )
             output_file_content = response.choices[0].message.content
-            with open('output.md', "w") as f:
+            with open(output_file, "w") as f:
                 f.write(output_file_content)
             remove_backticks_from_file(output_file)
             break
@@ -381,6 +402,25 @@ def main():
             print(f"\n{'!'*40}\nTests failed. Analyzing errors...\n{'!'*40}")
             error_log = get_last_error_log()
             errors_encountered.append(error_log.strip())
+            errors_text = "\n\n ".join(errors_encountered)
+            # Process and count error messages
+            error_counts = defaultdict(int)
+            for error in errors_encountered:
+                lines = error.strip().split('\n')
+                for line in lines:
+                    if 'Error' in line or 'Exception' in line:
+                        error_counts[line] += 1
+
+            # Identify repeating errors
+            repeating_errors = {msg: count for msg, count in error_counts.items() if count > 1}
+
+            # Prepare additional instruction if there are repeating errors
+            if repeating_errors:
+                repeating_errors_text = "\n".join([f"Error '{msg}' has occurred {count} times." for msg, count in repeating_errors.items()])
+                additional_instruction = f"The following errors have occurred multiple times:\n{repeating_errors_text}\nPlease consider trying a different approach to fix these errors."
+            else:
+                additional_instruction = ""
+            print("additional_instruction: ", additional_instruction)
             print(f"\nError: {error_log.strip()}")
             attempt += 1
             success = False
@@ -393,8 +433,9 @@ def main():
 
     log_data = {
         'Timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        'Input File Path': input_file,
-        'Output File Path': output_file,
+        'Type': input_type,
+        'Input': user_input,
+        'Output': output_file,
         'Number of Attempts': attempt-1,
         'Errors Encountered': "\n\n ".join(errors_encountered),
         'Execution Time (in seconds)': execution_time,
