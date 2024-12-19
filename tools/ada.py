@@ -34,25 +34,6 @@ for package in REQUIRED_PACKAGES:
     except pkg_resources.DistributionNotFound:
         subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
-# # Read the content of test.md
-# with open('test.md', 'r') as f:
-#     input_file_content = f.read()
-
-# # Read the content of converted_test.md
-# with open('converted_test.md', 'r') as f:
-#     output_file_content = f.read()
-# response = client.chat.completions.create(
-#     model=deployment_name,
-#     messages=[
-#         # {"role": "user", "content": f"""You are given two versions of a markdown document.\n\n- Keep all content within ALL code and output blocks **from the updated document**.\n- Keep all content outside code and output blocks **from the original document**.\n- Merge them into a single document.\n\nOriginal Document:\n\n {input_file_content}\n\nUpdated Document:\n\n {output_file_content}\n\nMerged Document:"""}
-#         {"role": "user", "content": f"""You are given two versions of a markdown document.\n\n- Add ALL missing details from the **Original Document** into the **Updated Document** that were not presented in the **Updated Document**, except code blocks and results blocks.\n\nOriginal Document:\n\n {input_file_content}\n\nUpdated Document:\n\n {output_file_content}\n\nMerged Document:"""}
-#     ]
-# )
-# output_file_content = response.choices[0].message.content
-# with open('final.md', "w") as f:
-#     f.write(output_file_content)
-
-# exit()
 system_prompt = """Exec Docs is a vehicle that transforms standard markdown into interactive, executable learning content, allowing code commands within the document to be run step-by-step or “one-click”. This is powered by the Innovation Engine, an open-source CLI tool that powers the execution and testing of these markdown scripts and can integrate with automated CI/CD pipelines. You are an Exec Doc writing expert. You will either write a new exec doc from scratch if no doc is attached or update an existing one if it is attached. You must adhere to the following rules while presenting your output:
 
 ### Prerequisites
@@ -388,7 +369,6 @@ def main():
             response = client.chat.completions.create(
                 model=deployment_name,
                 messages=[
-                    # {"role": "user", "content": f"""You are given two versions of a markdown document.\n\n- Keep all content within ALL code and output blocks **from the updated document**.\n- Keep all content outside code and output blocks **from the original document**.\n- Merge them into a single document.\n\nOriginal Document:\n\n {input_file_content}\n\nUpdated Document:\n\n {output_file_content}\n\nMerged Document:"""}
                     {"role": "user", "content": f"""You are given two versions of a markdown document.\n\n- Add ALL missing details from the **Original Document** into the **Updated Document** that were not presented in the **Updated Document**. HOWEVER, DO NOT TOUCH ANY CODE BLOCKS OR OUTPUT BLOCKS OR ANYTHING ELSE IN THE **Updated Document** ```\n\nOriginal Document:\n\n {input_file_content}\n\nUpdated Document:\n\n {output_file_content}\n\nMerged Document:"""}
                 ]
             )
