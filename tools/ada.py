@@ -420,7 +420,6 @@ def main():
                 additional_instruction = f"The following errors have occurred multiple times:\n{repeating_errors_text}\nPlease consider trying a different approach to fix these errors."
             else:
                 additional_instruction = ""
-            print("additional_instruction: ", additional_instruction)
             print(f"\nError: {error_log.strip()}")
             attempt += 1
             success = False
