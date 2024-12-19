@@ -1,3 +1,5 @@
+# WELCOME TO ADA - AI DOCUMENTATION ASSISTANT
+
 import os
 import sys
 import subprocess
@@ -391,7 +393,7 @@ def main():
                 ]
             )
             output_file_content = response.choices[0].message.content
-            with open(output_file, "w") as f:
+            with open('output.md', "w") as f:
                 f.write(output_file_content)
             remove_backticks_from_file(output_file)
             break
