@@ -71,3 +71,46 @@ Host key verification failed.
 '
 StdErr: Pseudo-terminal will not be allocated because stdin is not a terminal.
 Host key verification failed.",135.19094800949097,Success
+2024-12-20 21:08:11,workload_description,Creation of Speech Services application on Azure,generated_exec_doc.md,11,"time=2024-12-20T21:04:49-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 3.
+Error: unexpected end of JSON input
+StdErr:
+
+ time=2024-12-20T21:05:06-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 3.
+Error: unexpected end of JSON input
+StdErr:
+
+ time=2024-12-20T21:05:23-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 2.
+Error: invalid character 'K' looking for beginning of value
+StdErr:
+
+ time=2024-12-20T21:05:40-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 2.
+Error: invalid character 'K' after top-level value
+StdErr:
+
+ time=2024-12-20T21:05:59-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 2.
+Error: invalid character 'K' looking for beginning of value
+StdErr:
+
+ time=2024-12-20T21:06:19-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 3.
+Error: invalid character 'K' looking for beginning of value
+StdErr:
+
+ time=2024-12-20T21:06:41-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 3.
+Error: invalid character 'K' looking for beginning of value
+StdErr:
+
+ time=2024-12-20T21:07:05-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 3.
+Error: invalid character 'K' looking for beginning of value
+StdErr:
+
+ time=2024-12-20T21:07:29-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 3.
+Error: invalid character 'K' looking for beginning of value
+StdErr:
+
+ time=2024-12-20T21:07:49-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 3.
+Error: invalid character 'K' looking for beginning of value
+StdErr:
+
+ time=2024-12-20T21:08:11-08:00 level=error msg=Error testing scenario: failed to execute code block 0 on step 3.
+Error: invalid character 'K' looking for beginning of value
+StdErr:",216.4925456047058,Failure

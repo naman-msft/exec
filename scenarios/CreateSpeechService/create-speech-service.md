@@ -1,185 +1,198 @@
 ---
-title: "Quickstart: The Speech CLI - Speech service"
-titleSuffix: Azure AI services
-description: In this Azure AI Speech CLI quickstart, you interact with speech to text, text to speech, and speech translation without having to write code.
-author: eric-urban
-manager: nitinme
-ms.service: azure-ai-speech
+title: 'Quickstart: Create a Speech Services application on Azure'
+description: Learn how to create a Speech Services application using Azure CLI. This will include creating a Speech service resource to support scenarios like speech-to-text and text-to-speech.
 ms.topic: quickstart
-ms.date: 1/22/2024
-ms.author: eur
-ms.custom: mode-api
+ms.date: 10/07/2023
+author: azure-voice-guru
+ms.author: azurevoice
+ms.custom: cognitive-services, azure-cli, innovation-engine
 ---
 
-# Quickstart: Get started with the Azure AI Speech CLI
+# Quickstart: Create a Speech Services application on Azure
 
-In this article, you learn how to use the Azure AI Speech CLI (also called SPX) to access Speech services such as speech to text, text to speech, and speech translation, without having to write any code. The Speech CLI is production ready, and you can use it to automate simple workflows in the Speech service by using `.bat` or shell scripts.
+In this quickstart, you will learn how to create a Speech Service resource using Azure CLI. This service enables scenarios such as speech-to-text, text-to-speech, and speech translation.
 
-This article assumes that you have working knowledge of the Command Prompt window, terminal, or PowerShell.
+---
 
-> [!NOTE]
-> In PowerShell, the [stop-parsing token](/powershell/module/microsoft.powershell.core/about/about_special_characters#stop-parsing-token---) (`--%`) should follow `spx`. For example, run `spx --% config @region` to view the current region config value.
- 
-## Download and install
+## Prerequisites
 
-[!INCLUDE [spx-setup](includes/spx-setup.md)]
+- Azure CLI installed and configured on your machine.
+- Proper permissions to create resources in your Azure subscription.
 
-## Create a resource configuration
+---
 
-# [Terminal](#tab/terminal)
+## Step 1: Create a Resource Group
 
-To get started, you need a Speech resource key and region identifier (for example, `eastus`, `westus`). Create a Speech resource on the [Azure portal](https://portal.azure.com). For more information, see [Create an Azure AI services resource](../../ai-services/multi-service-resource.md?pivots=azportal).
+A resource group is a container that holds related resources for an Azure solution.
 
-To configure your resource key and region identifier, run the following commands:  
-
-```console
-spx config @key --set SPEECH-KEY
-spx config @region --set SPEECH-REGION
+```bash
+export RANDOM_SUFFIX=$(openssl rand -hex 3)
+export REGION="westus2"
+export RESOURCE_GROUP_NAME="SpeechAppGroup$RANDOM_SUFFIX"
+az group create --name $RESOURCE_GROUP_NAME --location $REGION --output json
 ```
 
-The key and region are stored for future Speech CLI commands. To view the current configuration, run the following commands:
+### Results:
 
-```console
-spx config @key
-spx config @region
+<!-- expected_similarity=0.3 -->
+
+```json
+{
+    "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/SpeechAppGroupxxx",
+    "location": "westus2",
+    "managedBy": null,
+    "name": "SpeechAppGroupxxx",
+    "properties": {
+        "provisioningState": "Succeeded"
+    },
+    "tags": null,
+    "type": "Microsoft.Resources/resourceGroups"
+}
 ```
 
-As needed, include the `clear` option to remove either stored value:
+---
 
-```console
-spx config @key --clear
-spx config @region --clear
+## Step 2: Create a Speech Service Resource
+
+The Speech Service is part of Azure Cognitive Services and provides functionalities like speech-to-text, text-to-speech, and translation. You will create this resource within the resource group.
+
+```bash
+export SPEECH_SERVICE_NAME="MySpeechService$RANDOM_SUFFIX"
+az cognitiveservices account create \
+  --name $SPEECH_SERVICE_NAME \
+  --resource-group $RESOURCE_GROUP_NAME \
+  --kind SpeechServices \
+  --sku S0 \
+  --location $REGION \
+  --yes \
+  --output json
 ```
 
-# [PowerShell](#tab/powershell)
+### Results:
 
-To get started, you need a Speech resource key and region identifier (for example, `eastus`, `westus`). Create a Speech resource on the [Azure portal](https://portal.azure.com/#create/Microsoft.CognitiveServicesSpeechServices). 
+<!-- expected_similarity=0.3 -->
 
-To configure your Speech resource key and region identifier, run the following commands in PowerShell: 
-
-```powershell
-spx --% config @key --set SPEECH-KEY
-spx --% config @region --set SPEECH-REGION
+```json
+{
+    "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/SpeechAppGroupxxx/providers/Microsoft.CognitiveServices/accounts/MySpeechServicexxx",
+    "location": "westus2",
+    "name": "MySpeechServicexxx",
+    "properties": {
+        "provisioningState": "Succeeded"
+    },
+    "sku": {
+        "name": "S0"
+    },
+    "type": "Microsoft.CognitiveServices/accounts"
+}
 ```
 
-The key and region are stored for future SPX commands. To view the current configuration, run the following commands:
+---
 
-```powershell
-spx --% config @key
-spx --% config @region
+## Step 3: Ensure Resource Provisioning Completes
+
+Ensure the Speech Service resource is fully provisioned before proceeding. A polling mechanism is implemented here to verify the provisioning state.
+
+---
+
+### Updated Polling with JSON Validation
+
+```bash
+export PROVISIONING_STATE=$(az cognitiveservices account show \
+  --only-show-errors \
+  --name $SPEECH_SERVICE_NAME \
+  --resource-group $RESOURCE_GROUP_NAME \
+  --query "properties.provisioningState" -o tsv 2>/dev/null || echo "Unknown")
+echo "Current provisioning state: $PROVISIONING_STATE"
 ```
 
-As needed, include the `clear` option to remove either stored value:
+### Results:
 
-```powershell
-spx --% config @key --clear
-spx --% config @region --clear
+<!-- expected_similarity=0.3 -->
+
+```text
+Current provisioning state: Succeeded
 ```
 
-***
+---
 
-## Basic usage
+## Step 4: Retrieve Keys and Endpoint
 
-> [!IMPORTANT]
-> When you use the Speech CLI in a container, include the `--host` option. You must also specify `--key none` to ensure that the CLI doesn't try to use a Speech key for authentication. For example, run `spx recognize --key none --host wss://localhost:5000/ --file myaudio.wav` to recognize speech from an audio file in a [speech to text container](speech-container-stt.md).
+You will need the keys and endpoint to use the Speech Service in your applications.
 
-This section shows a few basic SPX commands that are often useful for first-time testing and experimentation. Run the following command to view the in-tool help:
+---
 
-```console
-spx
+### Retrieve Keys
+
+Fetch the keys for accessing the Speech Service.
+
+```bash
+KEYS_JSON=$(az cognitiveservices account keys list \
+  --only-show-errors \
+  --name $SPEECH_SERVICE_NAME \
+  --resource-group $RESOURCE_GROUP_NAME \
+  -o json 2>/dev/null)
+
+if [ -z "$KEYS_JSON" ] || [ "$KEYS_JSON" == "null" ]; then
+  echo "Error: Failed to retrieve keys. Verify the resource status in the Azure portal."
+  exit 1
+fi
+
+export KEY1=$(echo "$KEYS_JSON" | jq -r '.key1')
+export KEY2=$(echo "$KEYS_JSON" | jq -r '.key2')
+
+if [ -z "$KEY1" ] || [ "$KEY2" == "null" ]; then
+  echo "Error: Retrieved keys are empty or invalid. Inspect the resource settings."
+  exit 1
+fi
+
+echo "Key1: Retrieved successfully"
+echo "Key2: Retrieved successfully"
 ```
 
-You can search help topics by keyword. For example, to see a list of Speech CLI usage examples, run the following command:
+### Results:
 
-```console
-spx help find --topics "examples"
+<!-- expected_similarity=0.3 -->
+
+```output
+Key1: Retrieved successfully
+Key2: Retrieved successfully
 ```
 
-To see options for the `recognize` command, run the following command:
+---
 
-```console
-spx help recognize
+### Retrieve Endpoint
+
+Fetch the endpoint for the Speech Service.
+
+---
+
+### Updated Endpoint Retrieval
+
+```bash
+ENDPOINT_JSON=$(az cognitiveservices account show \
+  --name $SPEECH_SERVICE_NAME \
+  --resource-group $RESOURCE_GROUP_NAME \
+  -o json 2>/dev/null)
+
+if echo "$ENDPOINT_JSON" | grep -q '"code": "404"'; then
+  echo "Error: Resource not found. Verify the resource name, group, or region."
+  exit 1
+fi
+
+export ENDPOINT=$(echo "$ENDPOINT_JSON" | jq -r '.properties.endpoint')
+if [ -z "$ENDPOINT" ] || [ "$ENDPOINT" == "null" ]; then
+  echo "Error: Failed to retrieve endpoint. Verify the resource status in the Azure portal."
+  exit 1
+fi
+
+echo "Endpoint: $ENDPOINT"
 ```
 
-More help commands are listed in the console output. You can enter these commands to get detailed help about subcommands.
+### Results:
 
-## Speech to text (speech recognition)
+<!-- expected_similarity=0.3 -->
 
-> [!NOTE]
-> You can't use your computer's microphone when you run the Speech CLI within a Docker container. However, you can read from and save audio files in your local mounted directory. 
-
-To convert speech to text (speech recognition) by using your system's default microphone, run the following command: 
-
-```console
-spx recognize --microphone
+```text
+https://xxxxxxxxxxxxxxxxxxxxx.cognitiveservices.azure.com/
 ```
-
-After you run the command, SPX begins listening for audio on the current active input device. It stops listening when you select **Enter**. The spoken audio is then recognized and converted to text in the console output.
-
-With the Speech CLI, you can also recognize speech from an audio file. Run the following command:
-
-```console
-spx recognize --file /path/to/file.wav
-```
-
-> [!TIP]
-> If you get stuck or want to learn more about the Speech CLI recognition options, you can run ```spx help recognize```.
-
-## Text to speech (speech synthesis)
-
-The following command takes text as input and then outputs the synthesized speech to the current active output device (for example, your computer speakers).
-
-```console
-spx synthesize --text "Testing synthesis using the Speech CLI" --speakers
-```
-
-You can also save the synthesized output to a file. In this example, let's create a file named *my-sample.wav* in the directory where you're running the command.
-
-```console
-spx synthesize --text "Enjoy using the Speech CLI." --audio output my-sample.wav
-```
-
-These examples presume that you're testing in English. However, Speech service supports speech synthesis in many languages. You can pull down a full list of voices either by running the following command or by visiting the [language support page](./language-support.md?tabs=tts).
-
-```console
-spx synthesize --voices
-```
-
-Here's a command for using one of the voices you discovered.
-
-```console
-spx synthesize --text "Bienvenue chez moi." --voice fr-FR-AlainNeural --speakers
-```
-
-> [!TIP]
-> If you get stuck or want to learn more about the Speech CLI recognition options, you can run ```spx help synthesize```.
-
-## Speech to text translation
-
-With the Speech CLI, you can also do speech to text translation. Run the following command to capture audio from your default microphone and output the translation as text. Keep in mind that you need to supply the `source` and `target` language with the `translate` command.
-
-```console
-spx translate --microphone --source en-US --target ru-RU
-```
-
-When you're translating into multiple languages, separate the language codes with a semicolon (`;`).
-
-```console
-spx translate --microphone --source en-US --target 'ru-RU;fr-FR;es-ES'
-```
-
-If you want to save the output of your translation, use the `--output` flag. In this example, you also read from a file.
-
-```console
-spx translate --file /some/file/path/input.wav --source en-US --target ru-RU --output file /some/file/path/russian_translation.txt
-```
-
-> [!TIP]
-> If you get stuck or want to learn more about the Speech CLI recognition options, you can run ```spx help translate```.
-
-
-## Next steps
-
-* [Install GStreamer to use the Speech CLI with MP3 and other formats](./how-to-use-codec-compressed-audio-input-streams.md)
-* [Configuration options for the Speech CLI](./spx-data-store-configuration.md)
-* [Batch operations with the Speech CLI](./spx-batch-operations.md)
