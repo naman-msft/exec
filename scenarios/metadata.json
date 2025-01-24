@@ -66,7 +66,7 @@
         }
     },
     {
-        "status": "inactive",
+        "status": "active",
         "key": "azure-databases-docs/articles/mysql/flexible-server/tutorial-deploy-wordpress-on-aks.md",
         "title": "Tutorial: Deploy WordPress on AKS cluster by using Azure CLI",
         "description": "Learn how to quickly build and deploy WordPress on AKS with Azure Database for MySQL - Flexible Server.",
@@ -653,7 +653,7 @@
         }
     },
     {
-        "status": "inactive",
+        "status": "active",
         "key": "CreateLinuxVMSecureWebServer/create-linux-vm-secure-web-server.md",
         "title": "Create a NGINX Webserver Secured via HTTPS",
         "description": "This tutorial shows how to create a NGINX Webserver Secured via HTTPS.",
@@ -679,7 +679,7 @@
         }
     },
     {
-        "status": "inactive",
+        "status": "active",
         "key": "azure-docs/articles/confidential-computing/confidential-enclave-nodes-aks-get-started.md",
         "title": "Quickstart: Deploy an AKS cluster with confidential computing Intel SGX agent nodes by using the Azure CLI",
         "description": "Learn how to create an Azure Kubernetes Service (AKS) cluster with enclave confidential containers a Hello World app by using the Azure CLI.",
@@ -701,7 +701,7 @@
         }
     },
     {
-        "status": "inactive",
+        "status": "active",
         "key": "azure-docs/articles/azure-linux/quickstart-azure-cli.md",
         "title": "Quickstart: Deploy an Azure Linux Container Host for AKS cluster by using the Azure CLI",
         "description": "Learn how to quickly create an Azure Linux Container Host for AKS cluster using the Azure CLI.",
@@ -720,7 +720,7 @@
         }
     },
     {
-        "status": "inactive",
+        "status": "active",
         "key": "azure-compute-docs/articles/virtual-machine-scale-sets/tutorial-use-custom-image-cli.md",
         "title": "Tutorial - Use a custom VM image in a scale set with Azure CLI",
         "description": "Learn how to use the Azure CLI to create a custom VM image that you can use to deploy a Virtual Machine Scale Set",
