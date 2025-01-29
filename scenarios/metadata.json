@@ -737,5 +737,24 @@
         "configurations": {
             "permissions": []
         }
+    },
+    {
+        "status": "active",
+        "key": "azure-docs/articles/virtual-network/create-virtual-machine-accelerated-networking.md",
+        "title": "Create an Azure Virtual Machine with Accelerated Networking",
+        "description": "Use Azure portal, Azure CLI, or PowerShell to create Linux or Windows virtual machines with Accelerated Networking enabled for improved network performance.",
+        "stackDetails": [],
+        "sourceUrl": "https://raw.githubusercontent.com/MicrosoftDocs/executable-docs/main/scenarios/azure-docs/articles/virtual-network/create-virtual-machine-accelerated-networking.md",
+        "documentationUrl": "https://learn.microsoft.com/en-us/azure/virtual-network/create-virtual-machine-accelerated-networking?tabs=cli",
+        "nextSteps": [
+            {
+                "title": "How Accelerated Networking works in Linux and FreeBSD VMs",
+                "url": "https://learn.microsoft.com/en-us/azure/virtual-network/accelerated-networking-how-it-works"
+            }
+            
+        ],
+        "configurations": {
+            "permissions": []
+        }
     }
 ]
