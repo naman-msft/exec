@@ -29,18 +29,18 @@ In this article, you create the infrastructure required to run Apache Airflow on
     ```bash
     random=$(echo $RANDOM | tr '[0-9]' '[a-z]')
     export MY_LOCATION=canadacentral
-    export MY_RESOURCE_GROUP_NAME=apache-airflow-rg
-    export MY_IDENTITY_NAME=airflow-identity-123
+    export MY_RESOURCE_GROUP_NAME=apache-airflow-rg$(echo $random)
+    export MY_IDENTITY_NAME=airflow-identity-123$(echo $random)
     export MY_ACR_REGISTRY=mydnsrandomname$(echo $random)
     export MY_KEYVAULT_NAME=airflow-vault-$(echo $random)-kv
-    export MY_CLUSTER_NAME=apache-airflow-aks
-    export SERVICE_ACCOUNT_NAME=airflow
+    export MY_CLUSTER_NAME=apache-airflow-aks$(echo $random)
+    export SERVICE_ACCOUNT_NAME=airflow$(echo $random)
     export SERVICE_ACCOUNT_NAMESPACE=airflow
     export AKS_AIRFLOW_NAMESPACE=airflow
-    export AKS_AIRFLOW_CLUSTER_NAME=cluster-aks-airflow
+    export AKS_AIRFLOW_CLUSTER_NAME=cluster-aks-airflow$(echo $random)
     export AKS_AIRFLOW_LOGS_STORAGE_ACCOUNT_NAME=airflowsasa$(echo $random)
-    export AKS_AIRFLOW_LOGS_STORAGE_CONTAINER_NAME=airflow-logs
-    export AKS_AIRFLOW_LOGS_STORAGE_SECRET_NAME=storage-account-credentials
+    export AKS_AIRFLOW_LOGS_STORAGE_CONTAINER_NAME=airflow-logs$(echo $random)
+    export AKS_AIRFLOW_LOGS_STORAGE_SECRET_NAME=storage-account-credentials$(echo $random)
     ```
 
 ## Create a resource group
