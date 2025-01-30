@@ -65,8 +65,9 @@ To find the roles that you need, see the documentation for the Azure service tha
 After you confirm which role to use, use the Azure CLI to create a Trusted Access role binding in the AKS cluster. The role binding associates your selected role with the Azure service.
 
 ```azurecli-interactive
-export ROLE_BINDING_NAME="myRoleBindingName"
-export SOURCE_RESOURCE_ID="mySourceResourceID"
+export RANDOM_SUFFIX=$(openssl rand -hex 3)
+export ROLE_BINDING_NAME="myRoleBindingName${RANDOM_SUFFIX}"
+export SOURCE_RESOURCE_ID="mySourceResourceID${RANDOM_SUFFIX}"
 export ROLE_NAME_1="myRoleName1"
 export ROLE_NAME_2="myRoleName2"
 
