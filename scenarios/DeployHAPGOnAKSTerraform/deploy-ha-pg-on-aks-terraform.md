@@ -73,18 +73,28 @@ Terraform v1.5.0
 
 1. Create a Terraform Configuration File Create a file named main.tf with the following content:
 
+```bash
+export RANDOM_SUFFIX=$(openssl rand -hex 4)
+export RESOURCE_GROUP_NAME="pg-ha-rg$RANDOM_SUFFIX"
+export AKS_CLUSTER_NAME="pg-ha-aks$RANDOM_SUFFIX"
+export POSTGRES_SERVER_NAME="pg-ha-server$RANDOM_SUFFIX"
+export POSTGRES_DATABASE_NAME=$POSTGRES_DATABASE_NAME
+export POSTGRES_DATABASE_PASSWORD=$(openssl rand -base64 32)
+export POSTGRES_DATABASE_USER="pgadmin$RANDOM_SUFFIX"
+```
+
 ```text
 provider "azurerm" {
   features {}
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "pg-ha-rg"
+  name     = $RESOURCE_GROUP_NAME
   location = "West Europe"
 }
 
 resource "azurerm_kubernetes_cluster" "aks" {
-  name                = "pg-ha-aks"
+  name                = $AKS_CLUSTER_NAME
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   dns_prefix          = "pgha"
@@ -107,7 +117,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 }
 
 resource "azurerm_postgresql_server" "pg_server" {
-  name                = "pg-ha-server"
+  name                = $POSTGRES_SERVER_NAME
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   version             = "11"
@@ -119,13 +129,13 @@ resource "azurerm_postgresql_server" "pg_server" {
   storage_profile {
     storage_mb = 5120
   }
-  administrator_login          = "pgadmin"
-  administrator_login_password = "YourPassword123!"
+  administrator_login          = $POSTGRES_DATABASE_USER
+  administrator_login_password = $POSTGRES_DATABASE_PASSWORD
   ssl_enforcement_enabled      = true
 }
 
 resource "azurerm_postgresql_database" "pg_database" {
-  name                = "mydatabase"
+  name                = $POSTGRES_DATABASE_NAME
   resource_group_name = azurerm_resource_group.rg.name
   server_name         = azurerm_postgresql_server.pg_server.name
   charset             = "UTF8"
@@ -213,8 +223,7 @@ Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
 6. Verify the Deployment Check the status of the AKS cluster:
 
 ```bash
-export RANDOM_SUFFIX=$(openssl rand -hex 4)
-az aks show --resource-group pg-ha-rg$RANDOM_SUFFIX --name pg-ha-aks$RANDOM_SUFFIX --output table
+az aks show --resource-group $RESOURCE_GROUP_NAME --name $AKS_CLUSTER_NAME --output table
 ```
 
 Results:
@@ -229,7 +238,7 @@ pg-ha-aks   pg-ha-rg       West Europe     1.20.7               Succeeded
 7. Connect to PostgreSQL To connect to your PostgreSQL server, you can use the following command:
 
 ```bash
-psql "host=pg-ha-server.postgres.database.azure.com dbname=mydatabase user=pgadmin@pg-ha-server password=YourPassword123! sslmode=require"
+psql "host=$POSTGRES_SERVER_NAME.postgres.database.azure.com dbname=$POSTGRES_DATABASE_NAME user=$POSTGRES_DATABASE_USER@$POSTGRES_SERVER_NAME password=$POSTGRES_DATABASE_PASSWORD sslmode=require"
 ```
 
 Results:
@@ -314,7 +323,17 @@ Wait a few moments until the EXTERNAL-IP is assigned. It may take a couple of mi
 3. Connect to the Application Once the external IP is assigned, you can connect to the PostgreSQL database using the following command. Replace <EXTERNAL-IP> with the actual external IP address you obtained from the previous step:
 
 ```bash
-psql "host=<EXTERNAL-IP> dbname=mydatabase user=pgadmin@pg-ha-server password=YourPassword123! sslmode=require"
+# Fetch the external IP address
+export EXTERNAL_IP=$(kubectl get services pg-app-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
+# Check if the EXTERNAL_IP is not empty
+if [ -z "$EXTERNAL_IP" ]; then
+  echo "Error: External IP address not found. Please wait a few moments and try again."
+  exit 1
+fi
+
+# Connect to the PostgreSQL database
+psql "host=$EXTERNAL_IP dbname=mydatabase user=pgadmin@pg-ha-server password=YourPassword123! sslmode=require"
 ```
 
 Results:
