@@ -18,14 +18,20 @@ In this guide, you will deploy a highly-available PostgreSQL cluster that spans 
 Use wget to download the latest version of Terraform. You can find the latest version on the Terraform releases page. For example, to download version 1.5.0:
 
 ```bash
-wget https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
+if ! command -v terraform &> /dev/null
+then
+    wget https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
+fi
 ```
 
 4. Unzip the Downloaded File
 After downloading, you need to extract the Terraform binary from the zip file:
 
 ```bash
-unzip terraform_1.5.0_linux_amd64.zip
+if ! command -v terraform &> /dev/null
+then
+  unzip terraform_1.5.0_linux_amd64.zip
+fi
 ```
 
 
