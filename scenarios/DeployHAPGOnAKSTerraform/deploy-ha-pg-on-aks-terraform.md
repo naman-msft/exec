@@ -74,6 +74,7 @@ Terraform v1.5.0
 1. Create a Terraform Configuration File Create a file named main.tf with the following content:
 
 ```bash
+# Generate a random suffix
 export RANDOM_SUFFIX=$(openssl rand -hex 4)
 export RESOURCE_GROUP_NAME="pg-ha-rg$RANDOM_SUFFIX"
 export AKS_CLUSTER_NAME="pg-ha-aks$RANDOM_SUFFIX"
@@ -81,6 +82,18 @@ export POSTGRES_SERVER_NAME="pg-ha-server$RANDOM_SUFFIX"
 export POSTGRES_DATABASE_NAME=$POSTGRES_DATABASE_NAME
 export POSTGRES_DATABASE_PASSWORD=$(openssl rand -base64 32)
 export POSTGRES_DATABASE_USER="pgadmin$RANDOM_SUFFIX"
+
+# Get the subscription ID programmatically
+export TF_VAR_subscription_id=$(az account show --query id --output tsv)
+
+# Set additional environment variables for Terraform
+export TF_VAR_resource_group_name=$RESOURCE_GROUP_NAME
+export TF_VAR_location="East US"
+export TF_VAR_aks_cluster_name=$AKS_CLUSTER_NAME
+export TF_VAR_postgres_server_name=$POSTGRES_SERVER_NAME
+export TF_VAR_postgres_database_name=$POSTGRES_DATABASE_NAME
+export TF_VAR_postgres_database_user=$POSTGRES_DATABASE_USER
+export TF_VAR_postgres_database_password=$POSTGRES_DATABASE_PASSWORD
 ```
 
 ```text
