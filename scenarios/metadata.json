@@ -536,13 +536,45 @@
     },
     {
         "status": "active",
-        "key": "DeployApacheAirflowOnAKS/deploy-apache-airflow-on-aks.md",
-        "title": "Quickstart: Deploy an Azure Kubernetes Service (AKS) cluster and Apache Airflow using Azure CLI",
-        "description": "Learn how to quickly deploy a Kubernetes cluster and deploy Apache Airflow in Azure Kubernetes Service (AKS) using Azure CLI.",
+        "key": "azure-aks-docs/articles/aks/airflow-create-infrastructure.md",
+        "title": "Create the infrastructure for deploying Apache Airflow on Azure Kubernetes Service (AKS)",
+        "description": "In this article, you create the infrastructure needed to deploy Apache Airflow on Azure Kubernetes Service (AKS) using Helm.",
         "stackDetails": "",
-        "sourceUrl": "https://raw.githubusercontent.com/MicrosoftDocs/executable-docs/main/scenarios/DeployApacheAirflowOnAKS/deploy-apache-airflow-on-aks.md",
+        "sourceUrl": "https://raw.githubusercontent.com/MicrosoftDocs/executable-docs/main/scenarios/azure-aks-docs/articles/aks/airflow-create-infrastructure.md",
         "documentationUrl": "",
-        "nextSteps": [],
+        "nextSteps": [
+            {
+                "title": "Deploy Apache Airflow on AKS",
+                "url": "https://learn.microsoft.com/en-us/azure/aks/airflow-deploy"
+            }
+        ],
+        "configurations": {
+            "permissions": []
+        }
+    },
+    {
+        "status": "active",
+        "key": "azure-aks-docs/articles/aks/airflow-deploy.md",
+        "title": "Configure and deploy Apache Airflow on Azure Kubernetes Service (AKS)",
+        "description": "In this article, you create the infrastructure needed to deploy Apache Airflow on Azure Kubernetes Service (AKS) using Helm.",
+        "stackDetails": "",
+        "sourceUrl": "https://raw.githubusercontent.com/MicrosoftDocs/executable-docs/main/scenarios/azure-aks-docs/articles/aks/airflow-deploy.md",
+        "documentationUrl": "",
+        "nextSteps": [
+            {
+                "title": "Deploy a MongoDB cluster on Azure Kubernetes Service (AKS)",
+                "url": "https://learn.microsoft.com/en-us/azure/aks/mongodb-overview"
+            },
+            {
+                "title": "Deploy a highly available PostgreSQL database on Azure Kubernetes Service (AKS)",
+                "url": "https://learn.microsoft.com/en-us/azure/aks/postgresql-ha-overview"
+            },
+            {
+                "title": "Deploy a Valkey cluster on Azure Kubernetes Service (AKS)",
+                "url": "https://learn.microsoft.com/en-us/azure/aks/valkey-overview"
+            }
+
+        ],
         "configurations": {
             "permissions": []
         }
@@ -757,6 +789,29 @@
             {
                 "title": "How Accelerated Networking works in Linux and FreeBSD VMs",
                 "url": "https://learn.microsoft.com/en-us/azure/virtual-network/accelerated-networking-how-it-works"
+            }
+            
+        ],
+        "configurations": {
+            "permissions": []
+        }
+    },
+    {
+        "status": "active",
+        "key": "DeployHAPGOnAKSTerraform/deploy-ha-pg-on-aks-terraform.md",
+        "title": "Create a Highly Available PostgreSQL Cluster on Azure Kubernetes Service (AKS) using Terraform",
+        "description": "This tutorial shows how to create a Highly Available PostgreSQL cluster on AKS using the CloudNativePG operator",
+        "stackDetails": [],
+        "sourceUrl": "https://raw.githubusercontent.com/MicrosoftDocs/executable-docs/main/scenarios/DeployHAPGOnAKSTerraform/deploy-ha-pg-on-aks-terraform.md",
+        "documentationUrl": "",
+        "nextSteps": [
+            {
+                "title": "Create infrastructure for deploying a highly available PostgreSQL database on AKS",
+                "url": "https://learn.microsoft.com/en-us/azure/aks/create-postgresql-ha?tabs=helm"
+            },
+            {
+                "title": "Deploy a highly available PostgreSQL database on AKS with Azure CLI",
+                "url": "https://learn.microsoft.com/en-us/azure/aks/deploy-postgresql-ha?tabs=helm"
             }
             
         ],
