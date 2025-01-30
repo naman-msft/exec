@@ -67,7 +67,7 @@ After you confirm which role to use, use the Azure CLI to create a Trusted Acces
 ```azurecli-interactive
 export RANDOM_SUFFIX=$(openssl rand -hex 3)
 export ROLE_BINDING_NAME="myRoleBindingName${RANDOM_SUFFIX}"
-export SOURCE_RESOURCE_ID="mySourceResourceID${RANDOM_SUFFIX}"
+export SOURCE_RESOURCE_ID=$(az storage account list --resource-group $RESOURCE_GROUP_NAME --query '[0].id' -o tsv)
 export ROLE_NAME_1="myRoleName1"
 export ROLE_NAME_2="myRoleName2"
 
