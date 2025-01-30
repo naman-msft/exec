@@ -213,7 +213,8 @@ Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
 6. Verify the Deployment Check the status of the AKS cluster:
 
 ```bash
-az aks show --resource-group pg-ha-rg --name pg-ha-aks --output table
+export RANDOM_SUFFIX=$(openssl rand -hex 4)
+az aks show --resource-group pg-ha-rg$RANDOM_SUFFIX --name pg-ha-aks$RANDOM_SUFFIX --output table
 ```
 
 Results:
