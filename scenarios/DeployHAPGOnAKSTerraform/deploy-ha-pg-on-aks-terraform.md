@@ -39,7 +39,19 @@ fi
 To make Terraform accessible from anywhere in your terminal, move it to /usr/local/bin:
 
 ```bash
-mv terraform /usr/local/bin/
+if ! command -v terraform &> /dev/null
+then
+  # Create a bin directory in your home directory if it doesn't exist
+  mkdir -p $HOME/bin
+
+  # Move Terraform to the bin directory in your home directory
+  mv terraform $HOME/bin/
+
+  # Add the bin directory to your PATH if it's not already included
+  if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
+      export PATH="$HOME/bin:$PATH"
+  fi
+fi
 ```
 
 
