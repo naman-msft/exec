@@ -419,6 +419,13 @@
         "stackDetails": "",
         "sourceUrl": "https://raw.githubusercontent.com/MicrosoftDocs/executable-docs/main/scenarios/azure-aks-docs/articles/aks/create-postgresql-ha.md",
         "documentationUrl": "",
+        "nextSteps": [
+            {
+                "title": "Deploy a highly available PostgreSQL database on AKS with Azure CLI",
+                "url": "https://learn.microsoft.com/en-us/azure/aks/deploy-postgresql-ha?tabs=helm"
+            }
+            
+        ],
         "configurations": {
         }
     },
@@ -750,6 +757,29 @@
             {
                 "title": "How Accelerated Networking works in Linux and FreeBSD VMs",
                 "url": "https://learn.microsoft.com/en-us/azure/virtual-network/accelerated-networking-how-it-works"
+            }
+            
+        ],
+        "configurations": {
+            "permissions": []
+        }
+    },
+    {
+        "status": "active",
+        "key": "DeployHAPGOnAKSTerraform/deploy-ha-pg-on-aks-terraform.md",
+        "title": "Create a Highly Available PostgreSQL Cluster on Azure Kubernetes Service (AKS) using Terraform",
+        "description": "This tutorial shows how to create a Highly Available PostgreSQL cluster on AKS using the CloudNativePG operator",
+        "stackDetails": [],
+        "sourceUrl": "https://raw.githubusercontent.com/MicrosoftDocs/executable-docs/main/scenarios/DeployHAPGOnAKSTerraform/deploy-ha-pg-on-aks-terraform.md",
+        "documentationUrl": "",
+        "nextSteps": [
+            {
+                "title": "Create infrastructure for deploying a highly available PostgreSQL database on AKS",
+                "url": "https://learn.microsoft.com/en-us/azure/aks/create-postgresql-ha?tabs=helm"
+            },
+            {
+                "title": "Deploy a highly available PostgreSQL database on AKS with Azure CLI",
+                "url": "https://learn.microsoft.com/en-us/azure/aks/deploy-postgresql-ha?tabs=helm"
             }
             
         ],

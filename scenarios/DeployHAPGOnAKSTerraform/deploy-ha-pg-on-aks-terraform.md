@@ -18,7 +18,7 @@ In this guide, you will deploy a highly-available PostgreSQL cluster that spans 
 Before installing any software, it’s a good practice to update your package index. This ensures that you have the latest information about available packages
 
 ```bash
-sudo apt-get update
+apt-get update
 ```
 
 
@@ -26,7 +26,7 @@ sudo apt-get update
 You need wget to download files from the internet and unzip to extract the downloaded files. Install them using the following command:
 
 ```bash
-sudo apt-get install -y wget unzip
+apt-get install -y wget unzip
 ```
 
 
