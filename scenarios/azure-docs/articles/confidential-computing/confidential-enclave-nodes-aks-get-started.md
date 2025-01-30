@@ -237,7 +237,12 @@ oe-helloworld   1/1           1s         23s
 ```
 
 ```bash
-kubectl get pods -l app=oe-helloworld
+while [[ $(kubectl get pods -l app=oe-helloworld -o 'jsonpath={..status.phase}') != "Succeeded" ]]; do
+  sleep 2
+done
+
+# Fetch the logs
+kubectl logs -l app=oe-helloworld
 ```
 
 Results:
