@@ -33,7 +33,7 @@ unzip terraform_1.5.0_linux_amd64.zip
 To make Terraform accessible from anywhere in your terminal, move it to /usr/local/bin:
 
 ```bash
-sudo mv terraform /usr/local/bin/
+mv terraform /usr/local/bin/
 ```
 
 
