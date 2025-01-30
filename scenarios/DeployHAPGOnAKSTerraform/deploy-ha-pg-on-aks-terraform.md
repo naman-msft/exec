@@ -14,22 +14,6 @@ In this guide, you will deploy a highly-available PostgreSQL cluster that spans 
 
 ## Installing Terraform
 
-1. Update Package Index
-Before installing any software, it’s a good practice to update your package index. This ensures that you have the latest information about available packages
-
-```bash
-apt-get update
-```
-
-
-2. Install Required Packages
-You need wget to download files from the internet and unzip to extract the downloaded files. Install them using the following command:
-
-```bash
-apt-get install -y wget unzip
-```
-
-
 3. Download Terraform
 Use wget to download the latest version of Terraform. You can find the latest version on the Terraform releases page. For example, to download version 1.5.0:
 
