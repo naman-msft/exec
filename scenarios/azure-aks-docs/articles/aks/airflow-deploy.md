@@ -481,9 +481,7 @@ In this section, we use Helm to install the External Secrets Operator. The Exter
 
 1. Securely access the Airflow UI through port-forwarding using the `kubectl port-forward` command.
 
-    ```bash
-    kubectl port-forward svc/airflow-webserver 8080:8080 -n airflow
-    ```
+    `kubectl port-forward svc/airflow-webserver 8080:8080 -n airflow`
 
 2. Open your browser and navigate to `localhost:8080` to access the Airflow UI.
 3. Use the default webserver URL and login credentials provided during the Airflow Helm chart installation to log in.
