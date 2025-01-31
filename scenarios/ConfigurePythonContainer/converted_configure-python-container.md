@@ -12,7 +12,7 @@ ms.custom: innovation-engine, devx-track-python, devx-track-azurecli, linux-rela
 
 In this quickstart, you'll learn how to configure a Python app deployed on Azure App Service using the Azure CLI. This includes setting and checking the Python version, listing the supported Python versions for App Service, and customizing build automation during deployment.
 
----
+
 
 ## Prerequisites
 
@@ -22,13 +22,13 @@ Ensure you have the following:
 - [Azure CLI installed](https://learn.microsoft.com/cli/azure/install-azure-cli) locally or access to [Azure Cloud Shell](https://ms.portal.azure.com/#cloudshell/).
 - Permissions to manage resources in your Azure subscription.
 
----
+
 
 ## Step 1: Create necessary resources
 
 The following commands create the required resources: a resource group, an App Service plan, and an App Service instance. **Random suffixes are included for resource names to avoid conflicts.**
 
----
+
 
 ### Create a resource group
 
@@ -57,7 +57,7 @@ Results:
 }
 ```
 
----
+
 
 ### Create an App Service plan
 
@@ -86,7 +86,7 @@ Results:
 }
 ```
 
----
+
 
 ### Create an App Service instance
 
@@ -109,7 +109,7 @@ Results:
 }
 ```
 
----
+
 
 ## Step 2: Show the current Python version
 
@@ -127,7 +127,7 @@ Results:
 "PYTHON|3.10"
 ```
 
----
+
 
 ## Step 3: Set the desired Python version
 
@@ -152,7 +152,7 @@ Results:
 "PYTHON|3.11"
 ```
 
----
+
 
 ## Step 4: List all supported Python runtime versions
 
@@ -176,13 +176,13 @@ Results:
 ]
 ```
 
----
+
 
 ## Step 5: Customize build automation
 
 Azure App Service automates the Python app-building process during deployment. These steps demonstrate how to configure or modify its behavior.
 
----
+
 
 ### Enable build automation
 
@@ -206,13 +206,13 @@ Results:
 ]
 ```
 
----
+
 
 ## Step 6: Add application settings
 
 App settings in Azure App Service act as environment variables within your app. Below, we add and verify a sample setting.
 
----
+
 
 ### Add a new App Service environment variable
 
@@ -243,6 +243,6 @@ Results:
 ]
 ```
 
----
+
 
 This quickstart provides a structured way to configure Python runtime settings, build automation, and other critical application settings for an Azure App Service instance using Azure CLI.
