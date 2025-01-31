@@ -131,7 +131,7 @@ If you don't have a managed identity created and assigned to your pod, perform t
    ```bash
    export AKS_CLUSTER_NAME=$MY_AKS_CLUSTER_NAME
    export AKS_RESOURCE_GROUP=$MY_AKS_RESOURCE_GROUP
-   export AKS_OIDC_ISSUER="$(az aks show --name "$AKS_CLUSTER_NAME" --resource-group "$AKS_RESOURCE_GROUP" --query "oidcIssuerProfile.issuerUrl" -o tsv)
+   export AKS_OIDC_ISSUER="$(az aks show --name "$AKS_CLUSTER_NAME" --resource-group "$AKS_RESOURCE_GROUP" --query "oidcIssuerProfile.issuerUrl" -o tsv)"
    ```
 
    The variable should contain the Issuer URL similar to the following example:
