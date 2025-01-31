@@ -403,7 +403,16 @@ In this section, we use Helm to install the External Secrets Operator. The Exter
 4. Install the Apache Airflow chart using the `helm install` command.
 
     ```bash
-    helm install airflow apache-airflow/airflow --namespace airflow --create-namespace -f airflow_values.yaml --debug
+    if ! helm list --namespace ${AKS_AIRFLOW_NAMESPACE} | grep -q external-secrets; then
+      helm install external-secrets \
+      external-secrets/external-secrets \
+      --namespace ${AKS_AIRFLOW_NAMESPACE} \
+      --create-namespace \
+      --set installCRDs=true \
+      --wait
+    else
+      echo "External Secrets Operator is already installed."
+    fi
     ```
 
     Example output:
