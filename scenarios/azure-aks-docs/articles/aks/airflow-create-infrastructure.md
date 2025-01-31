@@ -27,7 +27,7 @@ In this article, you create the infrastructure required to run Apache Airflow on
 * Set the required environment variables for use throughout this guide:
 
     ```bash
-    random=$(echo $RANDOM | tr '[0-9]' '[a-z]')
+    export random=$(echo $RANDOM | tr '[0-9]' '[a-z]')
     export MY_LOCATION=canadacentral
     export MY_RESOURCE_GROUP_NAME=apache-airflow-rg$(echo $random)
     export MY_IDENTITY_NAME=airflow-identity-123$(echo $random)
